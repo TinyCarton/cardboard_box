@@ -14,7 +14,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.ChestBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.ForgeConfigSpec;
 
 /**
  * 原版 Minecraft 的纸箱适配。
@@ -26,16 +25,10 @@ import net.minecraftforge.common.ForgeConfigSpec;
  * </ol>
  */
 public class VanillaHandler extends ModHandler {
-    private ForgeConfigSpec.BooleanValue spawnerVal;
 
     @Override
-    public void build(ForgeConfigSpec.Builder b) {
-        spawnerVal = b.comment("Prevents mob spawners from being placed into cardboard boxes").define("BlackListSettings.BlackListMobSpawners", false);
-    }
-
-    @Override
-    public void load(ForgeConfigSpec configuration) {
-        if (spawnerVal.get()) {
+    public void load() {
+        if (Config.get().blackListMobSpawners) {
             HandlerManager.INSTANCE.banBlock(Blocks.SPAWNER);
             HandlerManager.INSTANCE.banBlockEntity(BlockEntityType.MOB_SPAWNER);
         }
