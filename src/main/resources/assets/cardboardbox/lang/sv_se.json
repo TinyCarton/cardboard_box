@@ -1,6 +1,7 @@
 {
-    "block.cardboardbox.cardboard_box": "Kartonglåda",
-    "block.cardboardbox.cardboard_box.inventoryFull": "Det verkar som att ditt förråd är fullt",
-    "block.cardboardbox.cardboard_box.banned.block": "Jag tror inte att jag kan bära den där blocken",
-    "block.cardboardbox.cardboard_box.banned.tile": "Jag tror inte att jag kan bära den där blocken med innehållet"
+    "block.cardboardbox.cardboard_box":  "Kartonglåda",
+    "block.cardboardbox.cardboard_box.inventoryFull":  "Det verkar som att ditt förråd är fullt",
+    "block.cardboardbox.cardboard_box.banned.block":  "Jag tror inte att jag kan bära den där blocken",
+    "block.cardboardbox.cardboard_box.banned.tile":  "Jag tror inte att jag kan bära den där blocken med innehållet",
+    "block.cardboardbox.cardboard_box.notWhitelisted":  "This block is not allowed by the cardboard box whitelist"
 }

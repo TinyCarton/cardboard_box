@@ -109,6 +109,8 @@ public class BoxBlockItem extends BlockItem {
             player.displayClientMessage(Component.translatable(CardboardBox.BOX_BLOCK.get().getDescriptionId() + ".banned.tile"), true);
         } else if (result == CanPickUpResult.BANNED_BLOCK) {
             player.displayClientMessage(Component.translatable(CardboardBox.BOX_BLOCK.get().getDescriptionId() + ".banned.block"), true);
+        } else if (result == CanPickUpResult.NOT_WHITELISTED) {
+            player.displayClientMessage(Component.translatable(CardboardBox.BOX_BLOCK.get().getDescriptionId() + ".notWhitelisted"), true);
         }
         return InteractionResult.SUCCESS;
     }

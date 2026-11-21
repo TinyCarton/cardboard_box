@@ -6,11 +6,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.tinycarton.cardboardbox.handler.HandlerManager;
+import com.tinycarton.cardboardbox.handler.WhitelistManager;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
 
@@ -44,6 +46,11 @@ public class ModHandler {
     protected static IForgeRegistry<BlockEntityType<?>> BLOCK_ENTITIES_REGISTRY;
     /** 配置键（"命名空间:方块实体id"）→ 是否禁用 */
     public static final Map<String, ForgeConfigSpec.BooleanValue> blockEntityBanConfigMap = new HashMap<>();
+
+    /** 是否启用白名单（默认启用） */
+    private static ForgeConfigSpec.BooleanValue whitelistEnabled;
+    /** 是否启用黑名单（默认禁用；优先级高于白名单） */
+    private static ForgeConfigSpec.BooleanValue blacklistEnabled;
 
     /** 允许子类在加载阶段读取配置 */
     public void load(ForgeConfigSpec configuration) {
@@ -100,11 +107,18 @@ public class ModHandler {
     }
 
     /**
-     * 把注册表里所有方块实体类型都写进配置，默认值按"经验规则"判定：
-     * 名字里带 cable / wire / pipe / tube / conduit / channel 的（线缆、管道、导管）
-     * 默认禁用，其余默认允许。玩家可以逐个改成 true 来禁用。
+     * 白名单/黑名单开关 + 所有方块实体类型的开关列表。
+     * <p>
+     * 白名单默认启用、黑名单默认禁用；两者可以同时启用，此时黑名单优先。
+     * 白名单内容不在代码里，首次启动会生成
+     * {@code config/cardboardbox_whitelist.json}（只收录带方块实体的方块）。
      */
     public static void buildConfig(ForgeConfigSpec.Builder b) {
+        whitelistEnabled = b.comment("Only blocks listed in config/cardboardbox_whitelist.json can be picked up. The file is generated on first launch from all block-entity blocks.")
+                .define("WhitelistSettings.EnableWhitelist", true);
+        blacklistEnabled = b.comment("Enable the built-in blacklist. Takes priority over the whitelist when both are enabled.")
+                .define("BlacklistSettings.EnableBlacklist", false);
+
         String comment = """
                 Auto generated list of block entities registered in Minecraft that can be blocked from use with the box. \
                 If a block entity does not show up on this list it is already black listed. The reasoning behind blocking block entities is to prevent crashes or unwanted \
@@ -116,7 +130,7 @@ public class ModHandler {
                 if (name != null && type != null) {
                     try {
                         String typeString = ForgeRegistries.BLOCK_ENTITY_TYPES.getKey(type).toString();
-                        boolean shouldBan = HandlerManager.blockEntityBanList.contains(type) || isHeuristicBanned(typeString);
+                        boolean shouldBan = HandlerManager.blockEntityBanList.contains(type);
                         blockEntityBanConfigMap.put(typeString, b.define(typeString, shouldBan));
                     } catch (Exception e) {
                         LOGGER.error("ModHandler#buildConfig() -> Failed to add entry to config [{} > {}]", name, type, e);
@@ -134,7 +148,7 @@ public class ModHandler {
                 if (name != null && type != null) {
                     try {
                         String typeString = ForgeRegistries.BLOCK_ENTITY_TYPES.getKey(type).toString();
-                        boolean shouldBan = HandlerManager.blockEntityBanList.contains(type) || isHeuristicBanned(typeString);
+                        boolean shouldBan = HandlerManager.blockEntityBanList.contains(type);
                         if (blockEntityBanConfigMap.containsKey(typeString) ? blockEntityBanConfigMap.get(typeString).get() : false) {
                             HandlerManager.INSTANCE.banBlockEntity(type);
                         } else if (shouldBan) {
@@ -147,16 +161,11 @@ public class ModHandler {
                 }
             }
         }
-    }
 
-    /** 名称经验规则：线缆/管道类方块实体默认不安全，不参与搬运 */
-    private static boolean isHeuristicBanned(String typeString) {
-        return typeString.contains("cable")
-                || typeString.contains("wire")
-                || typeString.contains("pipe")
-                || typeString.contains("tube")
-                || typeString.contains("conduit")
-                || typeString.contains("channel");
+        // 白名单：首次启动时按注册表生成配置文件，之后读取
+        WhitelistManager.init(FMLPaths.CONFIGDIR.get());
+        HandlerManager.whitelistEnabled = whitelistEnabled.get();
+        HandlerManager.blacklistEnabled = blacklistEnabled.get();
     }
 
     private static void loadBlockEntityRegistry() {

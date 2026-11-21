@@ -1,6 +1,7 @@
 {
-    "block.cardboardbox.cardboard_box": "Karton",
-    "block.cardboardbox.cardboard_box.inventoryFull": "Wygląda na to, że ekwipunek jest pełny",
-    "block.cardboardbox.cardboard_box.banned.block": "Chyba nie zdołam przenieść tego bloku",
-    "block.cardboardbox.cardboard_box.banned.tile": "Chyba nie zdołam przenieść tego bloku wraz z zawartością"
+    "block.cardboardbox.cardboard_box":  "Karton",
+    "block.cardboardbox.cardboard_box.inventoryFull":  "Wygląda na to, że ekwipunek jest pełny",
+    "block.cardboardbox.cardboard_box.banned.block":  "Chyba nie zdołam przenieść tego bloku",
+    "block.cardboardbox.cardboard_box.banned.tile":  "Chyba nie zdołam przenieść tego bloku wraz z zawartością",
+    "block.cardboardbox.cardboard_box.notWhitelisted":  "This block is not allowed by the cardboard box whitelist"
 }
