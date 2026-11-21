@@ -31,7 +31,7 @@ public final class Config {
 
     /** 配置内容 */
     public static final class Data {
-        public boolean blackListMobSpawners = true;
+        public boolean blackListMobSpawners = false;
         public Map<String, Boolean> blockEntityBanList = new LinkedHashMap<>();
     }
 

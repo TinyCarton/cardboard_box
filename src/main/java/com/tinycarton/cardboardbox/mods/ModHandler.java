@@ -88,7 +88,7 @@ public class ModHandler {
                 continue;
             }
             String key = id.toString();
-            boolean shouldBan = HandlerManager.blockEntityBanList.contains(type) || isHeuristicBanned(key);
+            boolean shouldBan = HandlerManager.blockEntityBanList.contains(type);
             if (!data.blockEntityBanList.containsKey(key)) {
                 data.blockEntityBanList.put(key, shouldBan);
             }
@@ -99,15 +99,5 @@ public class ModHandler {
                 HandlerManager.blockEntityBanList.remove(type);
             }
         }
-    }
-
-    /** 名称经验规则：线缆/管道类方块实体默认不安全，不参与搬运 */
-    private static boolean isHeuristicBanned(String id) {
-        return id.contains("cable")
-                || id.contains("wire")
-                || id.contains("pipe")
-                || id.contains("tube")
-                || id.contains("conduit")
-                || id.contains("channel");
     }
 }

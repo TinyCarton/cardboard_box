@@ -91,7 +91,9 @@ public class BoxBlockItem extends BlockItem {
             level.removeBlockEntity(pos);
             // UPDATE_ALL = UPDATE_NEIGHBORS | UPDATE_CLIENTS：
             // 通知客户端，同时让周围方块（红石、栅栏连接、上方方块的支撑判定）立刻收到更新
-            level.setBlock(pos, getBlock().defaultBlockState(), Block.UPDATE_ALL);
+            // 纸箱正面朝向玩家（仅水平四向）
+            BlockState boxState = getBlock().defaultBlockState().setValue(BoxBlock.FACING, player.getDirection().getOpposite());
+            level.setBlock(pos, boxState, Block.UPDATE_ALL);
 
             if (level.getBlockEntity(pos) instanceof BoxBlockEntity boxBlockEntity) {
                 boxBlockEntity.setStateForPlacement(state);
