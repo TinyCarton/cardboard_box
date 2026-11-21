@@ -1,6 +1,7 @@
 {
-    "block.cardboardbox.cardboard_box": "Kartónová škatuľa",
-    "block.cardboardbox.cardboard_box.inventoryFull": "Zdá sa, že máš plný inventár",
-    "block.cardboardbox.cardboard_box.banned.block": "Nemyslím si, že ten blok unesiem",
-    "block.cardboardbox.cardboard_box.banned.tile": "Nemyslím si, že ten blok unesiem aj s obsahom"
+    "block.cardboardbox.cardboard_box":  "Kartónová škatuľa",
+    "block.cardboardbox.cardboard_box.inventoryFull":  "Zdá sa, že máš plný inventár",
+    "block.cardboardbox.cardboard_box.banned.block":  "Nemyslím si, že ten blok unesiem",
+    "block.cardboardbox.cardboard_box.banned.tile":  "Nemyslím si, že ten blok unesiem aj s obsahom",
+    "block.cardboardbox.cardboard_box.notWhitelisted":  "This block is not allowed by the cardboard box whitelist"
 }

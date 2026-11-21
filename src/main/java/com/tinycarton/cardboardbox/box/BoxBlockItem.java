@@ -30,10 +30,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.util.BlockSnapshot;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.event.level.BlockEvent;
 
 /**
  * 纸箱物品（BlockItem），整个模组的核心交互。
@@ -87,13 +83,6 @@ public class BoxBlockItem extends BlockItem {
 
         if (result == CanPickUpResult.CAN_PICK_UP) {
             final BlockState state = level.getBlockState(pos);
-
-            // Forge 钩子：搬运等同于移除方块，先询问在监听的安全插件（领地、地皮、保护服等），
-            // 被取消时整个操作中止，不消耗纸箱
-            if (MinecraftForge.EVENT_BUS.post(new BlockEvent.BreakEvent(level, pos, state, player))) {
-                return InteractionResult.FAIL;
-            }
-
             final BlockEntity blockEntity = level.getBlockEntity(pos);
             // 普通方块没有方块实体，此时只保存方块状态
             final CompoundTag tag = blockEntity != null ? blockEntity.saveWithId() : null;
@@ -102,7 +91,9 @@ public class BoxBlockItem extends BlockItem {
             level.removeBlockEntity(pos);
             // UPDATE_ALL = UPDATE_NEIGHBORS | UPDATE_CLIENTS：
             // 通知客户端，同时让周围方块（红石、栅栏连接、上方方块的支撑判定）立刻收到更新
-            level.setBlock(pos, getBlock().defaultBlockState(), Block.UPDATE_ALL);
+            // 纸箱正面朝向玩家（仅水平四向）
+            BlockState boxState = getBlock().defaultBlockState().setValue(BoxBlock.FACING, player.getDirection().getOpposite());
+            level.setBlock(pos, boxState, Block.UPDATE_ALL);
 
             if (level.getBlockEntity(pos) instanceof BoxBlockEntity boxBlockEntity) {
                 boxBlockEntity.setStateForPlacement(state);
@@ -118,6 +109,8 @@ public class BoxBlockItem extends BlockItem {
             player.displayClientMessage(Component.translatable(CardboardBox.BOX_BLOCK.get().getDescriptionId() + ".banned.tile"), true);
         } else if (result == CanPickUpResult.BANNED_BLOCK) {
             player.displayClientMessage(Component.translatable(CardboardBox.BOX_BLOCK.get().getDescriptionId() + ".banned.block"), true);
+        } else if (result == CanPickUpResult.NOT_WHITELISTED) {
+            player.displayClientMessage(Component.translatable(CardboardBox.BOX_BLOCK.get().getDescriptionId() + ".notWhitelisted"), true);
         }
         return InteractionResult.SUCCESS;
     }
@@ -150,12 +143,6 @@ public class BoxBlockItem extends BlockItem {
 
         if (context.getPlayer().mayUseItemAt(pos, context.getClickedFace(), heldItemStack)
                 && context.getLevel().getBlockState(pos).canBeReplaced()) {
-            // Forge 钩子：与 BlockItem#place 使用同一个放置事件，让保护类 mod 能拦下还原
-            BlockSnapshot snapshot = BlockSnapshot.create(context.getLevel().dimension(), context.getLevel(), pos);
-            if (ForgeEventFactory.onBlockPlace(context.getPlayer(), snapshot, context.getClickedFace())) {
-                return InteractionResult.FAIL;
-            }
-
             Handler handler = HandlerManager.INSTANCE.getHandler(storedBlockState.getBlock());
 
             // 优先还原原状态，保证朝向、连接、含水等属性一致

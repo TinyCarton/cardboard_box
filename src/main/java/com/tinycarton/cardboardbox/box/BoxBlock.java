@@ -5,12 +5,14 @@ import javax.annotation.Nullable;
 import com.tinycarton.cardboardbox.CardboardBox;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -19,6 +21,9 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.BlockHitResult;
 
@@ -35,6 +40,8 @@ import net.minecraft.world.phys.BlockHitResult;
  * </ul>
  */
 public class BoxBlock extends BaseEntityBlock {
+    /** 水平朝向（仅平面四向） */
+    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     /** ItemStack NBT：被装载方块的 BlockState.getId()（int） */
     public static final String STORE_ITEM_TAG = "storedItem";
     /** ItemStack NBT：被装载方块实体的 NBT（方块没有方块实体时不写入） */
@@ -44,6 +51,21 @@ public class BoxBlock extends BaseEntityBlock {
         super(BlockBehaviour.Properties.of()
                 .mapColor(MapColor.DIRT)
                 .strength(2f, 2f));
+        // 只有水平四向：默认朝北
+        registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH));
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(FACING);
+    }
+
+    /**
+     * 放置朝向：只考虑水平方向，正面朝向玩家。
+     */
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite());
     }
 
     @Override
@@ -60,36 +82,16 @@ public class BoxBlock extends BaseEntityBlock {
     @SuppressWarnings("deprecation")
     public void attack(BlockState state, Level level, BlockPos pos, Player player) {
         if (!level.isClientSide) {
-            if (level.getBlockEntity(pos) instanceof BoxBlockEntity boxBlockEntity && boxBlockEntity.getStateForPlacement() != null) {
-                // 1) 把纸箱位置换回原来的方块（UPDATE_ALL：通知客户端并触发周围方块的邻居更新）
-                if (level.setBlock(pos, boxBlockEntity.getStateForPlacement(), Block.UPDATE_ALL)) {
-                    // 2) 写回方块实体数据（容器里的东西、机器设置等）
-                    CompoundTag compound = boxBlockEntity.getDataForPlacement();
-                    if (compound != null) {
-                        BlockEntity blockEntity = level.getBlockEntity(pos);
-                        if (blockEntity != null) {
-                            blockEntity.load(compound);
-                        }
-                    }
-                    // 3) 让周围方块重新评估（红石、栅栏连接、上方方块的支撑判定）
-                    level.updateNeighborsAt(pos, level.getBlockState(pos).getBlock());
-
-                    // 4) 还给玩家一个空纸箱
-                    if (!player.isCreative()) {
-                        ItemStack stack = new ItemStack(this);
-                        // add() 成功时 stack 会被清空，此时 spawnAtLocation 实际不会掉落东西；
-                        // add() 失败才需要掉在地上。
-                        if (player.getInventory().add(stack)) {
-                            player.spawnAtLocation(stack, 0F);
-                        }
-                    }
-                }
-            }
+            restoreStoredBlock(level, pos, player);
         }
     }
 
     /**
-     * 潜行 + 右键：把纸箱收成物品（内容随 NBT 一起走）。
+     * 右键纸箱：
+     * <ul>
+     *     <li>普通右键：只把纸箱取下，里面的方块留在原位（空箱则直接取走空箱）</li>
+     *     <li>潜行 + 右键：连同方块一起收进纸箱带走</li>
+     * </ul>
      */
     // 同上：BlockBehaviour#use 同样被标记弃用，1.20.1 右键交互只能重写它
     @Override
@@ -98,23 +100,65 @@ public class BoxBlock extends BaseEntityBlock {
         if (level.isClientSide) {
             return InteractionResult.PASS;
         }
-        if (player.isShiftKeyDown()) {
+
+        boolean hasContent = level.getBlockEntity(pos) instanceof BoxBlockEntity boxBlockEntity
+                && boxBlockEntity.getStateForPlacement() != null;
+
+        // 潜行右键 = 连方块一起取下；空箱右键 = 直接取走空箱
+        if (player.isShiftKeyDown() || !hasContent) {
             ItemStack stack = toItemStack(level, pos);
-            if (stack != null) {
-                if (player.getInventory().add(stack)) {
-                    player.getInventory().setChanged();
-                    // removeBlock 内部使用 flag 3，会触发周围方块的邻居更新
-                    level.removeBlock(pos, false);
-                    return InteractionResult.SUCCESS;
-                } else {
-                    player.displayClientMessage(Component.translatable(CardboardBox.BOX_BLOCK.get().getDescriptionId() + ".inventoryFull"), true);
-                    return InteractionResult.PASS;
-                }
-            } else {
+            if (stack == null) {
                 player.displayClientMessage(Component.translatable(CardboardBox.BOX_BLOCK.get().getDescriptionId() + ".error.stack.null"), true);
+                return InteractionResult.PASS;
+            }
+            if (!player.getInventory().add(stack)) {
+                player.displayClientMessage(Component.translatable(CardboardBox.BOX_BLOCK.get().getDescriptionId() + ".inventoryFull"), true);
+                return InteractionResult.PASS;
+            }
+            player.getInventory().setChanged();
+            // removeBlock 内部使用 flag 3，会触发周围方块的邻居更新
+            level.removeBlock(pos, false);
+            return InteractionResult.SUCCESS;
+        }
+
+        // 普通右键：只取下纸箱，内容方块留在原位
+        return restoreStoredBlock(level, pos, player) ? InteractionResult.SUCCESS : InteractionResult.PASS;
+    }
+
+    /**
+     * 把纸箱里存的方块放回原位，写回方块实体数据，并在非创造模式下返还一个空纸箱。
+     *
+     * @return 是否成功还原（纸箱为空时返回 false）
+     */
+    private boolean restoreStoredBlock(Level level, BlockPos pos, Player player) {
+        if (!(level.getBlockEntity(pos) instanceof BoxBlockEntity boxBlockEntity) || boxBlockEntity.getStateForPlacement() == null) {
+            return false;
+        }
+        // 1) 把纸箱位置换回原来的方块（UPDATE_ALL：通知客户端并触发周围方块的邻居更新）
+        if (!level.setBlock(pos, boxBlockEntity.getStateForPlacement(), Block.UPDATE_ALL)) {
+            return false;
+        }
+        // 2) 写回方块实体数据（容器里的东西、机器设置等）
+        CompoundTag compound = boxBlockEntity.getDataForPlacement();
+        if (compound != null) {
+            BlockEntity blockEntity = level.getBlockEntity(pos);
+            if (blockEntity != null) {
+                blockEntity.load(compound);
             }
         }
-        return InteractionResult.PASS;
+        // 3) 让周围方块重新评估（红石、栅栏连接、上方方块的支撑判定）
+        level.updateNeighborsAt(pos, level.getBlockState(pos).getBlock());
+
+        // 4) 还给玩家一个空纸箱
+        if (!player.isCreative()) {
+            ItemStack stack = new ItemStack(this);
+            // add() 成功时 stack 会被清空，此时 spawnAtLocation 实际不会掉落东西；
+            // add() 失败才需要掉在地上。
+            if (player.getInventory().add(stack)) {
+                player.spawnAtLocation(stack, 0F);
+            }
+        }
+        return true;
     }
 
     /**
