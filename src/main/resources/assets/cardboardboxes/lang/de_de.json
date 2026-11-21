@@ -1,6 +1,0 @@
-{
-    "block.cardboardboxes.cardboardbox": "Kiste",
-    "block.cardboardboxes.cardboardbox.inventoryFull": "Es scheint, als ob dein Inventar voll ist",
-    "block.cardboardboxes.cardboardbox.banned.block": "Ich glaube nicht, dass ich diesen Block aufheben kann",
-    "block.cardboardboxes.cardboardbox.banned.tile": "Ich glaube nicht, dass ich dieses Objekt aufheben kann"
-}
