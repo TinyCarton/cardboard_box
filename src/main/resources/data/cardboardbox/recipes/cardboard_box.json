@@ -6,7 +6,7 @@
       "item": "minecraft:paper"
     },
     "S": {
-      "item": "minecraft:slime_ball"
+      "tag": "forge:slimeballs"
     },
     "W": {
       "tag": "minecraft:logs"
@@ -18,7 +18,7 @@
     "PPP"
   ],
   "result": {
-    "item": "cardboardbox:cardboardbox"
+    "item": "cardboardbox:cardboard_box"
   },
   "show_notification": true
 }

@@ -1,6 +1,6 @@
 {
-    "block.cardboardbox.cardboardbox": "纸箱子",
-    "block.cardboardbox.cardboardbox.inventoryFull": "你的背包好像满了",
-    "block.cardboardbox.cardboardbox.banned.block": "这个方块我好像搬不动",
-    "block.cardboardbox.cardboardbox.banned.tile": "这个方块实体我好像搬不动"
+    "block.cardboardbox.cardboard_box": "纸箱",
+    "block.cardboardbox.cardboard_box.inventoryFull": "你的背包好像满了",
+    "block.cardboardbox.cardboard_box.banned.block": "这个方块我好像搬不动",
+    "block.cardboardbox.cardboard_box.banned.tile": "这个方块实体我好像搬不动"
 }

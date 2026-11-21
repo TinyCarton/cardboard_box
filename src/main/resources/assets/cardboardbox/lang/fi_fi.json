@@ -1,0 +1,6 @@
+{
+    "block.cardboardbox.cardboard_box": "Pahvilaatikko",
+    "block.cardboardbox.cardboard_box.inventoryFull": "Varastosi näyttää olevan täynnä",
+    "block.cardboardbox.cardboard_box.banned.block": "En usko, että pystyn kantamaan tuota lohkoa",
+    "block.cardboardbox.cardboard_box.banned.tile": "En usko, että pystyn kantamaan tuota lohkoa sisältöineen"
+}

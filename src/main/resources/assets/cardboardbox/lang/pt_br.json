@@ -1,0 +1,6 @@
+{
+    "block.cardboardbox.cardboard_box": "Caixa de papelão",
+    "block.cardboardbox.cardboard_box.inventoryFull": "Seu inventário parece cheio",
+    "block.cardboardbox.cardboard_box.banned.block": "Acho que não consigo carregar esse bloco",
+    "block.cardboardbox.cardboard_box.banned.tile": "Acho que não consigo carregar esse bloco com o conteúdo"
+}

@@ -36,7 +36,7 @@ public class CardboardBox implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
     // ===== 方块 =====
-    public static final BoxBlock BOX_BLOCK = Registry.register(BuiltInRegistries.BLOCK, id("cardboardbox"), new BoxBlock());
+    public static final BoxBlock BOX_BLOCK = Registry.register(BuiltInRegistries.BLOCK, id("cardboard_box"), new BoxBlock());
 
     // ===== 方块实体 =====
     /**
@@ -51,7 +51,7 @@ public class CardboardBox implements ModInitializer {
     // ===== 物品 =====
     public static final BoxBlockItem BOX_ITEM = Registry.register(
             BuiltInRegistries.ITEM,
-            id("cardboardbox"),
+            id("cardboard_box"),
             new BoxBlockItem(BOX_BLOCK));
 
     @Override

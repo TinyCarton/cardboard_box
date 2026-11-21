@@ -1,0 +1,6 @@
+{
+    "block.cardboardbox.cardboard_box": "กล่องกระดาษแข็ง",
+    "block.cardboardbox.cardboard_box.inventoryFull": "ดูเหมือนว่ากระเป๋าของคุณจะเต็ม",
+    "block.cardboardbox.cardboard_box.banned.block": "ฉันไม่คิดว่าจะยกบล็อกนั้นได้",
+    "block.cardboardbox.cardboard_box.banned.tile": "ฉันไม่คิดว่าจะยกบล็อกนั้นพร้อมของข้างในได้"
+}
