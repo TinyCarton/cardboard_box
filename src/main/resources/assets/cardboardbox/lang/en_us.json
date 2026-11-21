@@ -1,0 +1,6 @@
+{
+    "block.cardboardbox.cardboardbox": "Box",
+    "block.cardboardbox.cardboardbox.inventoryFull": "It seems your inventory is full",
+    "block.cardboardbox.cardboardbox.banned.block": "I don't think I can pick that block up",
+    "block.cardboardbox.cardboardbox.banned.tile": "I don't think I can pick that tile up"
+}
