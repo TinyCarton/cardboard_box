@@ -20,3 +20,17 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+--------------------------------------------------------------------------------
+
+ARTWORK NOTICE
+
+The MIT license above covers the source code of this project only.
+
+All artistic assets shipped with this mod - including textures, models, icons
+and any other graphical assets under `src/main/resources/assets/` - are
+Copyright (c) 2026 TinyCarton. All rights reserved.
+
+These assets may not be redistributed, reused, modified, or included in other
+projects, in whole or in part, without explicit written permission from the
+copyright holder.
