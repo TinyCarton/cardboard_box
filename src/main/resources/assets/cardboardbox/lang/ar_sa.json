@@ -1,0 +1,6 @@
+{
+    "block.cardboardbox.cardboard_box": "صندوق كرتوني",
+    "block.cardboardbox.cardboard_box.inventoryFull": "يبدو أن حقيبتك ممتلئة",
+    "block.cardboardbox.cardboard_box.banned.block": "لا أظن أنني أستطيع حمل ذلك المكعب",
+    "block.cardboardbox.cardboard_box.banned.tile": "لا أظن أنني أستطيع حمل ذلك المكعب مع محتوياته"
+}

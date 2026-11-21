@@ -1,0 +1,6 @@
+{
+    "block.cardboardbox.cardboard_box": "Kartondoboz",
+    "block.cardboardbox.cardboard_box.inventoryFull": "Úgy tűnik, tele van a hátizsákod",
+    "block.cardboardbox.cardboard_box.banned.block": "Nem hiszem, hogy el tudom vinni azt a blokkot",
+    "block.cardboardbox.cardboard_box.banned.tile": "Nem hiszem, hogy el tudom vinni azt a blokkot a tartalmával együtt"
+}

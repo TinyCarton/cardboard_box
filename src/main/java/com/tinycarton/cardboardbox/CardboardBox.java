@@ -46,7 +46,7 @@ public class CardboardBox {
 
     // ===== 方块 =====
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, DOMAIN);
-    public static final RegistryObject<BoxBlock> BOX_BLOCK = BLOCKS.register("cardboardbox", BoxBlock::new);
+    public static final RegistryObject<BoxBlock> BOX_BLOCK = BLOCKS.register("cardboard_box", BoxBlock::new);
 
     // ===== 方块实体 =====
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, DOMAIN);
@@ -59,7 +59,7 @@ public class CardboardBox {
 
     // ===== 物品 =====
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, DOMAIN);
-    public static final RegistryObject<BoxBlockItem> BOX_ITEM = ITEMS.register("cardboardbox", () -> new BoxBlockItem(BOX_BLOCK.get()));
+    public static final RegistryObject<BoxBlockItem> BOX_ITEM = ITEMS.register("cardboard_box", () -> new BoxBlockItem(BOX_BLOCK.get()));
 
     /** 通用配置：自动生成的所有方块实体黑名单 + 各 mod 处理器选项 */
     private static ForgeConfigSpec config;

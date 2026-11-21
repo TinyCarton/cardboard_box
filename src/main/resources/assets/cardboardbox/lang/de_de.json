@@ -1,6 +1,6 @@
 {
-    "block.cardboardbox.cardboardbox": "Kiste",
-    "block.cardboardbox.cardboardbox.inventoryFull": "Es scheint, als ob dein Inventar voll ist",
-    "block.cardboardbox.cardboardbox.banned.block": "Ich glaube nicht, dass ich diesen Block aufheben kann",
-    "block.cardboardbox.cardboardbox.banned.tile": "Ich glaube nicht, dass ich dieses Objekt aufheben kann"
+    "block.cardboardbox.cardboard_box": "Karton",
+    "block.cardboardbox.cardboard_box.inventoryFull": "Dein Inventar scheint voll zu sein",
+    "block.cardboardbox.cardboard_box.banned.block": "Ich glaube nicht, dass ich diesen Block tragen kann",
+    "block.cardboardbox.cardboard_box.banned.tile": "Ich glaube nicht, dass ich diesen Block mit seinem Inhalt tragen kann"
 }

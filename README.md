@@ -54,7 +54,7 @@ src/main/java/com/tinycarton/cardboardbox/
 └── mods/VanillaHandler.java   原版黑名单 + 箱子朝向修正
 src/main/resources/
 ├── META-INF/mods.toml
-├── assets/cardboardbox/     模型 / 方块状态 / 贴图 / 5 种语言
+├── assets/cardboardbox/     模型 / 方块状态 / 贴图 / 34 种语言（含 zh_cn、zh_tw、lzh）
 └── data/                      配方 + 进度
 ```
 
