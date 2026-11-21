@@ -23,6 +23,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
  * </ul>
  * 另外 {@code mods.toml} 里的配置会把 Minecraft/其他 mod 的所有方块实体自动列成开关
  * （见 {@code ModHandler#buildConfig}），玩家可在 config 里逐个放开。
+ * <p>
+ * 注意：<b>没有方块实体的普通方块默认也可以装</b>，此时只保存方块状态。
  */
 public class HandlerManager {
     /** 单例，方便静态注册 */
@@ -67,22 +69,20 @@ public class HandlerManager {
 
     /**
      * 判断某个位置能否装进纸箱。
+     * <p>
+     * 任何方块都可以装，只有黑名单会拦截；方块实体只影响额外数据是否保存。
      *
      * @see BoxBlockItem#tryToPickupBlock
      */
     public CanPickUpResult canPickUp(Level world, BlockPos pos) {
         Block block = world.getBlockState(pos).getBlock();
-        if (!blockBanList.contains(block)) {
-            BlockEntity blockEntity = world.getBlockEntity(pos);
-            if (blockEntity != null) {
-                if (!blockEntityBanList.contains(blockEntity.getType())) {
-                    // 没有任何 NBT 的方块实体（比如空漏斗）装了也没意义
-                    return !blockEntity.saveWithoutMetadata().isEmpty() ? CanPickUpResult.CAN_PICK_UP : CanPickUpResult.NO_DATA;
-                }
-                return CanPickUpResult.BANNED_BLOCK_ENTITY;
-            }
-            return CanPickUpResult.NO_BLOCK_ENTITY;
+        if (blockBanList.contains(block)) {
+            return CanPickUpResult.BANNED_BLOCK;
         }
-        return CanPickUpResult.BANNED_BLOCK;
+        BlockEntity blockEntity = world.getBlockEntity(pos);
+        if (blockEntity != null && blockEntityBanList.contains(blockEntity.getType())) {
+            return CanPickUpResult.BANNED_BLOCK_ENTITY;
+        }
+        return CanPickUpResult.CAN_PICK_UP;
     }
 }

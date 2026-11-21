@@ -19,7 +19,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
@@ -33,7 +32,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 /**
- * 纸箱物品（BlockItem），整个模组的核心交互都在这里。
+ * 纸箱物品（BlockItem），整个模组的核心交互。
  * <p>
  * 右键逻辑分两条路：
  * <ol>
@@ -43,18 +42,10 @@ import net.minecraft.world.level.block.state.BlockState;
  * 服务端权威：客户端直接返回 SUCCESS，避免客户端做半套状态导致方块鬼影。
  */
 public class BoxBlockItem extends BlockItem {
-    /** 染色颜色，null = 普通纸箱 */
-    public final DyeColor color;
 
-    public BoxBlockItem(Block block, DyeColor color) {
+    public BoxBlockItem(Block block) {
         super(block, new Item.Properties());
-        this.color = color;
     }
-
-    // 后续扩展点：
-    // 1) 有内容时换模型（比如箱子上露出一点内容物的渲染）
-    // 2) 按内容物给物品栏加不同等级的光效
-    // 3) 记录"谁装的/装的时间"用于服务器审计
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
@@ -73,7 +64,7 @@ public class BoxBlockItem extends BlockItem {
                 return tryToPlaceBlock(new BlockPlaceContext(context));
             } else {
                 // 空箱子 → 装方块
-                return tryToPickupBlock(player, level, context.getClickedPos(), hand, context.getClickedFace());
+                return tryToPickupBlock(player, level, context.getClickedPos(), hand);
             }
         }
         return InteractionResult.FAIL;
@@ -82,42 +73,40 @@ public class BoxBlockItem extends BlockItem {
     /**
      * 把点击的方块装进箱子。
      * <p>
-     * 步骤：校验黑名单 → 抓 BlockState → 抓 BE 的 saveWithId → 移除原 BE
-     * → 放上纸箱方块 → 把数据塞进纸箱 BE → 消耗一个箱子物品。
+     * 任何方块都可以装：没有方块实体的方块只保存方块状态，有方块实体的额外保存其 NBT。
+     * <p>
+     * 步骤：校验黑名单 → 抓 BlockState → 抓 BE 的 saveWithId（可能为 null）→ 移除原 BE
+     * → 放上纸箱方块并触发方块更新 → 把数据塞进纸箱 BE → 消耗一个箱子物品。
      */
-    protected InteractionResult tryToPickupBlock(Player player, Level level, BlockPos pos, InteractionHand hand, Direction direction) {
-        // 1) 黑名单 / 数据校验
+    protected InteractionResult tryToPickupBlock(Player player, Level level, BlockPos pos, InteractionHand hand) {
         CanPickUpResult result = HandlerManager.INSTANCE.canPickUp(level, pos);
 
         if (result == CanPickUpResult.CAN_PICK_UP) {
-            BlockEntity blockEntity = level.getBlockEntity(pos);
-            if (blockEntity != null) {
-                final BlockState state = level.getBlockState(pos);
-                // saveWithId 会带上 id，还原时 BlockEntity.load 能正确识别（容器物品等）
-                CompoundTag tag = blockEntity.saveWithId();
+            final BlockState state = level.getBlockState(pos);
+            final BlockEntity blockEntity = level.getBlockEntity(pos);
+            // 普通方块没有方块实体，此时只保存方块状态
+            final CompoundTag tag = blockEntity != null ? blockEntity.saveWithId() : null;
 
-                // 先移除旧 BE，再替换方块，避免旧 BE 残留
-                level.removeBlockEntity(pos);
-                level.setBlock(pos, getBlock().defaultBlockState(), Block.UPDATE_CLIENTS);
+            // 先移除旧 BE，再替换方块，避免旧 BE 残留
+            level.removeBlockEntity(pos);
+            // UPDATE_ALL = UPDATE_NEIGHBORS | UPDATE_CLIENTS：
+            // 通知客户端，同时让周围方块（红石、栅栏连接、上方方块的支撑判定）立刻收到更新
+            level.setBlock(pos, getBlock().defaultBlockState(), Block.UPDATE_ALL);
 
-                if (level.getBlockEntity(pos) instanceof BoxBlockEntity boxBlockEntity) {
-                    boxBlockEntity.setStateForPlacement(state);
-                    boxBlockEntity.setDataForPlacement(tag);
+            if (level.getBlockEntity(pos) instanceof BoxBlockEntity boxBlockEntity) {
+                boxBlockEntity.setStateForPlacement(state);
+                boxBlockEntity.setDataForPlacement(tag);
 
-                    // 消耗手上的纸箱
-                    player.getItemInHand(hand).shrink(1);
-                    return InteractionResult.SUCCESS;
-                }
-            } else {
-                player.displayClientMessage(Component.translatable(Cardboardboxes.BOX_BLOCK.get().getDescriptionId() + ".noData"), true);
+                // 消耗手上的纸箱
+                player.getItemInHand(hand).shrink(1);
             }
-        } else if (result == CanPickUpResult.BANNED_BLOCK_ENTITY) {
+            return InteractionResult.SUCCESS;
+        }
+
+        if (result == CanPickUpResult.BANNED_BLOCK_ENTITY) {
             player.displayClientMessage(Component.translatable(Cardboardboxes.BOX_BLOCK.get().getDescriptionId() + ".banned.tile"), true);
         } else if (result == CanPickUpResult.BANNED_BLOCK) {
             player.displayClientMessage(Component.translatable(Cardboardboxes.BOX_BLOCK.get().getDescriptionId() + ".banned.block"), true);
-        } else {
-            // NO_BLOCK_ENTITY / NO_DATA：没有方块实体，或方块实体没有值得保存的数据
-            player.displayClientMessage(Component.translatable(Cardboardboxes.BOX_BLOCK.get().getDescriptionId() + ".noData"), true);
         }
         return InteractionResult.SUCCESS;
     }
@@ -127,9 +116,10 @@ public class BoxBlockItem extends BlockItem {
      * <p>
      * 关键点：
      * <ul>
+     *     <li>优先沿用原来的方块状态（朝向、连接、水位等），放不下时才按点击面重新计算</li>
      *     <li>方块放置优先交给 {@link Handler}（模组方块可以自定义放置逻辑）</li>
      *     <li>没有 handler 就走原版 {@link BlockItem#placeBlock}</li>
-     *     <li>放置后再把 NBT 塞进新的方块实体，最后消耗物品并返还一个空箱</li>
+     *     <li>放置后写回 NBT，并触发一次邻居更新</li>
      * </ul>
      */
     protected InteractionResult tryToPlaceBlock(BlockPlaceContext context) {
@@ -147,18 +137,29 @@ public class BoxBlockItem extends BlockItem {
         final BlockState storedBlockState = getStoredBlock(heldItemStack);
         final CompoundTag storedBlockEntityData = getStoredBlockEntityData(heldItemStack);
 
-        if (storedBlockState != null && context.getPlayer().mayUseItemAt(pos, context.getClickedFace(), heldItemStack) && context.getLevel().getBlockState(pos).canBeReplaced()) {
+        if (context.getPlayer().mayUseItemAt(pos, context.getClickedFace(), heldItemStack)
+                && context.getLevel().getBlockState(pos).canBeReplaced()) {
             Handler handler = HandlerManager.INSTANCE.getHandler(storedBlockState.getBlock());
-            BlockState blockstate = storedBlockState.getBlock().getStateForPlacement(context);
 
-            // handler 优先；它返回 false 时退回原版放置逻辑
+            // 优先还原原状态，保证朝向、连接、含水等属性一致
+            BlockState stateToPlace = storedBlockState;
+            if (!storedBlockState.canSurvive(context.getLevel(), pos)) {
+                // 原状态在当前位置无法存活（例如悬空的火把），按点击面重新计算
+                BlockState adjusted = storedBlockState.getBlock().getStateForPlacement(context);
+                if (adjusted != null) {
+                    stateToPlace = adjusted;
+                }
+            }
+
+            // handler 优先；它返回 false 时退回原版放置逻辑（flag 11 已包含邻居更新）
             if (handler != null && handler.placeBlock(context.getPlayer(), context.getLevel(), pos, hand, context.getClickedFace(), hitX, hitY, hitZ, storedBlockState, storedBlockEntityData)
-                    || placeBlock(context, blockstate)) {
-                blockstate = context.getLevel().getBlockState(pos);
+                    || placeBlock(context, stateToPlace)) {
+                BlockState blockstate = context.getLevel().getBlockState(pos);
 
                 // 放置后修正（例如箱子朝向）
                 if (handler != null) {
                     handler.postPlaceBlock(context.getPlayer(), context.getLevel(), pos, hand, context.getClickedFace(), hitX, hitY, hitZ, storedBlockState, storedBlockEntityData);
+                    blockstate = context.getLevel().getBlockState(pos);
                 }
 
                 // 写回方块实体数据
@@ -172,6 +173,9 @@ public class BoxBlockItem extends BlockItem {
                         }
                     }
                 }
+
+                // 触发一次邻居更新：让周围方块按新放下的方块重新评估状态
+                context.getLevel().updateNeighborsAt(pos, blockstate.getBlock());
 
                 // 播放被放置方块自己的音效
                 SoundType soundtype = blockstate.getBlock().getSoundType(blockstate, context.getLevel(), pos, context.getPlayer());
@@ -211,7 +215,7 @@ public class BoxBlockItem extends BlockItem {
                 : Blocks.AIR.defaultBlockState();
     }
 
-    /** @return 物品里存的方块实体 NBT；没有内容返回 null */
+    /** @return 物品里存的方块实体 NBT；方块没有方块实体时返回 null */
     public CompoundTag getStoredBlockEntityData(ItemStack stack) {
         return stack.getTag() != null && stack.getTag().contains(BLOCK_ENTITY_DATA_TAG)
                 ? stack.getTag().getCompound(BLOCK_ENTITY_DATA_TAG)

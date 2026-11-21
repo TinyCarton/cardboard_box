@@ -10,7 +10,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -22,36 +21,29 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
 
 /**
  * 纸箱方块。
  * <p>
- * 两种形态共用一个类：
+ * 世界里的"装满东西的纸箱"由 {@link BoxBlockEntity} 记录内容，外观仍是纸箱；
+ * 物品形态的内容记录在 ItemStack 的 NBT 里（{@link #toItemStack}）。
+ * <p>
+ * 交互：
  * <ul>
- *     <li>放置在世界里的"装满东西的纸箱"：状态由 {@link BoxBlockEntity} 记录，外观仍是纸箱</li>
- *     <li>物品形态的纸箱：内容记录在 ItemStack 的 NBT 里（{@link #toItemStack}）</li>
- * </ul>
- * 交互（{@link #attack} 与 {@link #use}）：
- * <ul>
- *     <li>左键敲击（{@link #attack}）：把纸箱里的东西原样放回去，玩家拿回一个空纸箱</li>
- *     <li>潜行 + 右键（{@link #use}）：把纸箱变成物品，内容包括存档数据一起带走</li>
+ *     <li>左键敲击（{@link #attack}）：把纸箱里的方块原样放回去，玩家拿回一个空纸箱</li>
+ *     <li>潜行 + 右键（{@link #use}）：把纸箱收成物品，内容一起带走</li>
  * </ul>
  */
 public class BoxBlock extends BaseEntityBlock {
     /** ItemStack NBT：被装载方块的 BlockState.getId()（int） */
     public static final String STORE_ITEM_TAG = "storedItem";
-    /** ItemStack NBT：被装载方块实体的 NBT */
+    /** ItemStack NBT：被装载方块实体的 NBT（方块没有方块实体时不写入） */
     public static final String BLOCK_ENTITY_DATA_TAG = "tileData";
 
-    /** 染色颜色，null = 未染色的普通纸箱 */
-    public final DyeColor color;
-
-    public BoxBlock(DyeColor color) {
+    public BoxBlock() {
         super(BlockBehaviour.Properties.of()
-                .mapColor(color == null ? MapColor.DIRT : color.getMapColor())
+                .mapColor(MapColor.DIRT)
                 .strength(2f, 2f));
-        this.color = color;
     }
 
     @Override
@@ -62,8 +54,6 @@ public class BoxBlock extends BaseEntityBlock {
 
     /**
      * 左键敲击纸箱：把存的方块放回原位，并把空纸箱还给玩家。
-     * <p>
-     * 对应反编译里的 {@code m_6256_} = {@code BlockBehaviour#attack}。
      */
     // 1.20.1 的 BlockBehaviour#attack 被标记为 @Deprecated，但左键交互仍然只有这一个入口
     @Override
@@ -71,7 +61,7 @@ public class BoxBlock extends BaseEntityBlock {
     public void attack(BlockState state, Level level, BlockPos pos, Player player) {
         if (!level.isClientSide) {
             if (level.getBlockEntity(pos) instanceof BoxBlockEntity boxBlockEntity && boxBlockEntity.getStateForPlacement() != null) {
-                // 1) 把纸箱位置换回原来的方块
+                // 1) 把纸箱位置换回原来的方块（UPDATE_ALL：通知客户端并触发周围方块的邻居更新）
                 if (level.setBlock(pos, boxBlockEntity.getStateForPlacement(), Block.UPDATE_ALL)) {
                     // 2) 写回方块实体数据（容器里的东西、机器设置等）
                     CompoundTag compound = boxBlockEntity.getDataForPlacement();
@@ -81,11 +71,14 @@ public class BoxBlock extends BaseEntityBlock {
                             blockEntity.load(compound);
                         }
                     }
-                    // 3) 还给玩家一个空纸箱
+                    // 3) 让周围方块重新评估（红石、栅栏连接、上方方块的支撑判定）
+                    level.updateNeighborsAt(pos, level.getBlockState(pos).getBlock());
+
+                    // 4) 还给玩家一个空纸箱
                     if (!player.isCreative()) {
                         ItemStack stack = new ItemStack(this);
-                        // 注意：add() 成功时 stack 会被清空，此时 spawnAtLocation 实际不会掉落东西；
-                        // add() 失败才需要掉在地上。原版逻辑就是这样的写法，行为是正确的。
+                        // add() 成功时 stack 会被清空，此时 spawnAtLocation 实际不会掉落东西；
+                        // add() 失败才需要掉在地上。
                         if (player.getInventory().add(stack)) {
                             player.spawnAtLocation(stack, 0F);
                         }
@@ -110,6 +103,7 @@ public class BoxBlock extends BaseEntityBlock {
             if (stack != null) {
                 if (player.getInventory().add(stack)) {
                     player.getInventory().setChanged();
+                    // removeBlock 内部使用 flag 3，会触发周围方块的邻居更新
                     level.removeBlock(pos, false);
                     return InteractionResult.SUCCESS;
                 } else {
@@ -134,7 +128,7 @@ public class BoxBlock extends BaseEntityBlock {
         if (level.getBlockEntity(pos) instanceof BoxBlockEntity blockEntity) {
             if (blockEntity.getStateForPlacement() != null) {
                 stack.setTag(new CompoundTag());
-                // 方块状态用全局 id 存，反序列化时用 Block.stateById 还原
+                // 方块状态用全局 id 存，反序列化时用 Block.stateById 还原（含全部属性）
                 stack.getTag().putInt(STORE_ITEM_TAG, Block.getId(blockEntity.getStateForPlacement()));
                 if (blockEntity.getDataForPlacement() != null) {
                     stack.getTag().put(BLOCK_ENTITY_DATA_TAG, blockEntity.getDataForPlacement());
@@ -150,7 +144,7 @@ public class BoxBlock extends BaseEntityBlock {
      * 创造模式中键取方块 / 结构方块保存时使用，保证复制出来的物品也带内容。
      */
     @Override
-    public ItemStack getCloneItemStack(BlockState state, HitResult target, BlockGetter level, BlockPos pos, Player player) {
+    public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
         return toItemStack(level, pos);
     }
 
