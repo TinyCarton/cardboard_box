@@ -1,10 +1,23 @@
-# ===== Gradle / Forge 构建产物 =====
+# ===== Gradle / Forge / NeoForge 构建产物 =====
 build/
 .gradle/
 run/
+runs/
 out/
 classes/
 *.log
+
+# ===== 开发期运行产物（runServer/runClient 生成，不入库）=====
+eula.txt
+server.properties
+usercache.json
+banned-ips.json
+banned-players.json
+ops.json
+whitelist.json
+world/
+crash-reports/
+logs/
 
 # ===== IDE =====
 .idea/

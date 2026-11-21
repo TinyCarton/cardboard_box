@@ -21,8 +21,9 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
  *     <li>方块层 {@link #blockBanList}：整个世界都不许搬（活塞、信标、潜影盒……）</li>
  *     <li>方块实体层 {@link #blockEntityBanList}：类型不允许（例如刷怪笼 BE）</li>
  * </ul>
- * 另外 {@code mods.toml} 里的配置会把 Minecraft/其他 mod 的所有方块实体自动列成开关
- * （见 {@code ModHandler#buildConfig}），玩家可在 config 里逐个放开。
+ * 另外配置会把 Minecraft/其他 mod 的所有方块实体自动列成开关
+ * （见 {@code ModHandler#buildConfig}，落在 {@code config/cardboardboxes-common.toml}），
+ * 玩家可在 config 里逐个放开。
  * <p>
  * 注意：<b>没有方块实体的普通方块默认也可以装</b>，此时只保存方块状态。
  */

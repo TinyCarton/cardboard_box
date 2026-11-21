@@ -19,7 +19,6 @@ import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -37,7 +36,6 @@ import net.minecraftforge.registries.RegistryObject;
  *     <li>装好的纸箱物品只用 ItemStack NBT 记录内容，可以放进背包、箱子、漏斗</li>
  * </ul>
  */
-@Mod.EventBusSubscriber(bus = Bus.MOD)
 @Mod(Cardboardboxes.DOMAIN)
 public class Cardboardboxes {
     /** 模组 id，同时也是所有注册名的命名空间 */

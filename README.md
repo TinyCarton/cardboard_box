@@ -93,6 +93,22 @@ public class CreateHandler extends ModHandler {
 名字带 `cable` / `wire` / `pipe` / `tube` / `conduit` / `channel` 的默认禁用，其余默认允许；
 `BlackListSettings.BlackListMobSpawners` 控制刷怪笼。方块层黑名单见 `VanillaHandler`。
 
+## 本分支：NeoForge 实现
+
+`neoforge-1.20.1` 分支使用 NeoGradle + NeoForge **47.1.106**（Minecraft 1.20.1）：
+
+| 关注点 | 本分支的实现 |
+| --- | --- |
+| 构建 | `net.neoforged.gradle.userdev` 7.0.192（Gradle 8.6 / JDK 17） |
+| 依赖 | `net.neoforged:forge:1.20.1-47.1.106`（NeoForge 1.20.1 仍按 forge 坐标发布） |
+| 包名 | NeoForge 1.20.1 仍是 `net.minecraftforge.*`，源码与 Forge 分支保持同一套 import |
+| 运行配置 | `runs { client / server }`，服务端带 `--nogui` |
+| 元数据 | `META-INF/mods.toml`，依赖 `forge [47,)`、`minecraft [1.20,1.21)`、`loaderVersion [1,)` |
+| 保护类 mod 兼容 | `BlockEvent.BreakEvent` + `ForgeEventFactory.onBlockPlace`（与 Forge 同名同签名） |
+
+与 `forge-1.20.1` 的差异集中在构建系统（NeoGradle vs ForgeGradle）；核心代码
+（`box/`、`handler/`、`mods/`）两边保持一致，改动时注意同步。
+
 ## 移植到其他版本 / 加载器
 
 核心逻辑只依赖 `Block` / `BlockEntity` / `BlockItem` 的生命周期，需要改的是注册层与事件层：
