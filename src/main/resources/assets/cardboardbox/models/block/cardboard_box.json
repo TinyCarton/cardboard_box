@@ -1,7 +1,7 @@
 {
   "parent": "block/cube",
   "textures": {
-    "particle": "cardboardbox:block/box_side1",
+    "particle": "cardboardbox:block/cardboard_box_side1",
     "down": "cardboardbox:block/cardboard_box_bottom",
     "up": "cardboardbox:block/cardboard_box_top",
     "east": "cardboardbox:block/cardboard_box_side2",
