@@ -32,7 +32,7 @@ set JAVA_HOME=C:\Program Files\Java\jdk-17
 gradlew.bat build
 ```
 
-产物：`build/libs/cardboardboxes-1.20.1-0.1.2.jar`
+产物：`build/libs/cardboardbox-1.20.1-0.1.2.jar`
 
 其他任务：`gradlew.bat runClient`、`gradlew.bat runServer`。
 
@@ -42,8 +42,8 @@ gradlew.bat build
 ## 结构
 
 ```
-src/main/java/com/tinycarton/cardboardboxes/
-├── Cardboardboxes.java        注册方块 / 物品 / 方块实体，创造栏，配置装载
+src/main/java/com/tinycarton/cardboardbox/
+├── CardboardBox.java        注册方块 / 物品 / 方块实体，创造栏，配置装载
 ├── box/BoxBlock.java          左键还原、潜行右键收物品、物品化（toItemStack）
 ├── box/BoxBlockEntity.java    只存 storedTile + tileData
 ├── box/BoxBlockItem.java      核心：装方块 / 放方块
@@ -54,7 +54,7 @@ src/main/java/com/tinycarton/cardboardboxes/
 └── mods/VanillaHandler.java   原版黑名单 + 箱子朝向修正
 src/main/resources/
 ├── META-INF/mods.toml
-├── assets/cardboardboxes/     模型 / 方块状态 / 贴图 / 5 种语言
+├── assets/cardboardbox/     模型 / 方块状态 / 贴图 / 5 种语言
 └── data/                      配方 + 进度
 ```
 
@@ -87,9 +87,9 @@ public class CreateHandler extends ModHandler {
 }
 ```
 
-在 `Cardboardboxes` 构造器里登记：`ModHandler.modSupportHandlerMap.put("create", CreateHandler.class);`
+在 `CardboardBox` 构造器里登记：`ModHandler.modSupportHandlerMap.put("create", CreateHandler.class);`
 
-配置 `config/cardboardboxes-common.toml` 会自动列出所有已注册的方块实体类型（含其他 mod），
+配置 `config/cardboardbox-common.toml` 会自动列出所有已注册的方块实体类型（含其他 mod），
 名字带 `cable` / `wire` / `pipe` / `tube` / `conduit` / `channel` 的默认禁用，其余默认允许；
 `BlackListSettings.BlackListMobSpawners` 控制刷怪笼。方块层黑名单见 `VanillaHandler`。
 

@@ -1,0 +1,6 @@
+{
+    "block.cardboardbox.cardboard_box": "Kartonová krabice",
+    "block.cardboardbox.cardboard_box.inventoryFull": "Zdá se, že máš plný inventář",
+    "block.cardboardbox.cardboard_box.banned.block": "Nemyslím si, že ten blok unesu",
+    "block.cardboardbox.cardboard_box.banned.tile": "Nemyslím si, že ten blok unesu i s obsahem"
+}

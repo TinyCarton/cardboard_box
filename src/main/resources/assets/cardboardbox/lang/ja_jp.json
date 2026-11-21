@@ -1,0 +1,6 @@
+{
+    "block.cardboardbox.cardboard_box": "段ボール箱",
+    "block.cardboardbox.cardboard_box.inventoryFull": "インベントリがいっぱいのようです",
+    "block.cardboardbox.cardboard_box.banned.block": "このブロックは持ち運べないと思います",
+    "block.cardboardbox.cardboard_box.banned.tile": "中身ごとこのブロックを持ち運ぶことはできないと思います"
+}
