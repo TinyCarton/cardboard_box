@@ -1,6 +1,7 @@
 {
-    "block.cardboardbox.cardboard_box": "Caixa de cartão",
-    "block.cardboardbox.cardboard_box.inventoryFull": "O teu inventário parece estar cheio",
-    "block.cardboardbox.cardboard_box.banned.block": "Acho que não consigo transportar esse bloco",
-    "block.cardboardbox.cardboard_box.banned.tile": "Acho que não consigo transportar esse bloco com o conteúdo"
+    "block.cardboardbox.cardboard_box":  "Caixa de cartão",
+    "block.cardboardbox.cardboard_box.inventoryFull":  "O teu inventário parece estar cheio",
+    "block.cardboardbox.cardboard_box.banned.block":  "Acho que não consigo transportar esse bloco",
+    "block.cardboardbox.cardboard_box.banned.tile":  "Acho que não consigo transportar esse bloco com o conteúdo",
+    "block.cardboardbox.cardboard_box.notWhitelisted":  "This block is not allowed by the cardboard box whitelist"
 }

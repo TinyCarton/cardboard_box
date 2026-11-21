@@ -31,6 +31,10 @@ public final class Config {
 
     /** 配置内容 */
     public static final class Data {
+        /** 是否启用白名单（默认启用） */
+        public boolean whitelistEnabled = true;
+        /** 是否启用黑名单（默认禁用；优先级高于白名单） */
+        public boolean blacklistEnabled = false;
         public boolean blackListMobSpawners = false;
         public Map<String, Boolean> blockEntityBanList = new LinkedHashMap<>();
     }

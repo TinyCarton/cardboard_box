@@ -109,6 +109,8 @@ public class BoxBlockItem extends BlockItem {
             player.displayClientMessage(Component.translatable(CardboardBox.BOX_BLOCK.getDescriptionId() + ".banned.tile"), true);
         } else if (result == CanPickUpResult.BANNED_BLOCK) {
             player.displayClientMessage(Component.translatable(CardboardBox.BOX_BLOCK.getDescriptionId() + ".banned.block"), true);
+        } else if (result == CanPickUpResult.NOT_WHITELISTED) {
+            player.displayClientMessage(Component.translatable(CardboardBox.BOX_BLOCK.getDescriptionId() + ".notWhitelisted"), true);
         }
         return InteractionResult.SUCCESS;
     }
@@ -197,8 +199,7 @@ public class BoxBlockItem extends BlockItem {
     }
 
     // 注意：1.20.1 的 Item#getMaxStackSize() 是 final，Fabric 侧无法按 ItemStack 的 NBT 调整堆叠上限。
-    // 这里沿用默认 64：不同 NBT 的纸箱不会互相合并（MC 的堆叠判定会检查 NBT 是否一致），
-    // 但同一物品栏格里的多个带内容纸箱仍占同一上限。需要严格"有内容即不可堆叠"时用 mixin 覆盖该 final 方法。
+    // 不同 NBT 的纸箱不会互相合并，但同一格仍按默认 64 处理；严格限制需用 mixin。
 
     @Override
     public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {

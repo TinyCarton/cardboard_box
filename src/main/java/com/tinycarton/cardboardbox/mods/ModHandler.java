@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.tinycarton.cardboardbox.CardboardBox;
 import com.tinycarton.cardboardbox.handler.HandlerManager;
+import com.tinycarton.cardboardbox.handler.WhitelistManager;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -77,11 +78,18 @@ public class ModHandler {
     }
 
     /**
-     * 把注册表里所有方块实体类型写进配置，默认值按"经验规则"判定：
-     * 名字里带 cable / wire / pipe / tube / conduit / channel 的（线缆、管道、导管）默认禁用。
+     * 应用白名单/黑名单开关，并把注册表里所有方块实体类型写进配置（默认只反映显式黑名单）。
      */
     private static void applyConfig() {
         Config.Data data = Config.get();
+
+        // 白名单/黑名单开关；黑名单优先级更高
+        HandlerManager.whitelistEnabled = data.whitelistEnabled;
+        HandlerManager.blacklistEnabled = data.blacklistEnabled;
+
+        // 白名单文件：首次启动按「带方块实体的方块」自动生成
+        WhitelistManager.init(FabricLoader.getInstance().getConfigDir());
+
         for (ResourceLocation id : BuiltInRegistries.BLOCK_ENTITY_TYPE.keySet()) {
             BlockEntityType<?> type = BuiltInRegistries.BLOCK_ENTITY_TYPE.get(id);
             if (type == null) {

@@ -39,6 +39,11 @@ public class HandlerManager {
     /** 被禁用的方块 */
     public static final List<Block> blockBanList = new ArrayList<>();
 
+    /** 是否启用白名单（默认启用） */
+    public static boolean whitelistEnabled = true;
+    /** 是否启用黑名单（默认禁用） */
+    public static boolean blacklistEnabled = false;
+
     /** 为某个方块实体类注册处理器（预留） */
     public void registerPickupHandler(Class<? extends BlockEntity> clazz, Handler handler) {
         pickupHandlerMap.put(clazz, handler);
@@ -70,19 +75,33 @@ public class HandlerManager {
     /**
      * 判断某个位置能否装进纸箱。
      * <p>
-     * 任何方块都可以装，只有黑名单会拦截；方块实体只影响额外数据是否保存。
+     * 判定顺序：
+     * <ol>
+     *     <li>黑名单（启用时）优先——同时命中黑白名单的方块按黑名单处理</li>
+     *     <li>白名单（启用时）——不在名单内的方块被拒绝</li>
+     *     <li>其余方块允许，没有方块实体的只保存方块状态</li>
+     * </ol>
      *
      * @see BoxBlockItem#tryToPickupBlock
      */
     public CanPickUpResult canPickUp(Level world, BlockPos pos) {
         Block block = world.getBlockState(pos).getBlock();
-        if (blockBanList.contains(block)) {
-            return CanPickUpResult.BANNED_BLOCK;
+
+        // 黑名单优先级高于白名单
+        if (blacklistEnabled) {
+            if (blockBanList.contains(block)) {
+                return CanPickUpResult.BANNED_BLOCK;
+            }
+            BlockEntity blockEntity = world.getBlockEntity(pos);
+            if (blockEntity != null && blockEntityBanList.contains(blockEntity.getType())) {
+                return CanPickUpResult.BANNED_BLOCK_ENTITY;
+            }
         }
-        BlockEntity blockEntity = world.getBlockEntity(pos);
-        if (blockEntity != null && blockEntityBanList.contains(blockEntity.getType())) {
-            return CanPickUpResult.BANNED_BLOCK_ENTITY;
+
+        if (whitelistEnabled && !WhitelistManager.isAllowed(block)) {
+            return CanPickUpResult.NOT_WHITELISTED;
         }
+
         return CanPickUpResult.CAN_PICK_UP;
     }
 }
