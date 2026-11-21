@@ -116,7 +116,7 @@ public class ModHandler {
                 if (name != null && type != null) {
                     try {
                         String typeString = ForgeRegistries.BLOCK_ENTITY_TYPES.getKey(type).toString();
-                        boolean shouldBan = HandlerManager.blockEntityBanList.contains(type) || isHeuristicBanned(typeString);
+                        boolean shouldBan = HandlerManager.blockEntityBanList.contains(type);
                         blockEntityBanConfigMap.put(typeString, b.define(typeString, shouldBan));
                     } catch (Exception e) {
                         LOGGER.error("ModHandler#buildConfig() -> Failed to add entry to config [{} > {}]", name, type, e);
@@ -134,7 +134,7 @@ public class ModHandler {
                 if (name != null && type != null) {
                     try {
                         String typeString = ForgeRegistries.BLOCK_ENTITY_TYPES.getKey(type).toString();
-                        boolean shouldBan = HandlerManager.blockEntityBanList.contains(type) || isHeuristicBanned(typeString);
+                        boolean shouldBan = HandlerManager.blockEntityBanList.contains(type);
                         if (blockEntityBanConfigMap.containsKey(typeString) ? blockEntityBanConfigMap.get(typeString).get() : false) {
                             HandlerManager.INSTANCE.banBlockEntity(type);
                         } else if (shouldBan) {
@@ -147,16 +147,6 @@ public class ModHandler {
                 }
             }
         }
-    }
-
-    /** 名称经验规则：线缆/管道类方块实体默认不安全，不参与搬运 */
-    private static boolean isHeuristicBanned(String typeString) {
-        return typeString.contains("cable")
-                || typeString.contains("wire")
-                || typeString.contains("pipe")
-                || typeString.contains("tube")
-                || typeString.contains("conduit")
-                || typeString.contains("channel");
     }
 
     private static void loadBlockEntityRegistry() {
