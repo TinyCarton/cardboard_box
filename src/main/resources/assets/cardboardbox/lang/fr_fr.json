@@ -1,0 +1,6 @@
+{
+    "block.cardboardbox.cardboardbox": "Boîte",
+    "block.cardboardbox.cardboardbox.inventoryFull": "Votre inventaire semble plein",
+    "block.cardboardbox.cardboardbox.banned.block": "Je ne pense pas pouvoir ramasser ce bloc",
+    "block.cardboardbox.cardboardbox.banned.tile": "Je ne pense pas pouvoir ramasser ce bloc"
+}

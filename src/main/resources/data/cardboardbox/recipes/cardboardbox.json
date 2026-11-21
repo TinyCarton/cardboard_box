@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "P": {
+      "item": "minecraft:paper"
+    },
+    "S": {
+      "item": "minecraft:slime_ball"
+    },
+    "W": {
+      "tag": "minecraft:logs"
+    }
+  },
+  "pattern": [
+    "PPP",
+    "SWS",
+    "PPP"
+  ],
+  "result": {
+    "item": "cardboardbox:cardboardbox"
+  },
+  "show_notification": true
+}
