@@ -1,6 +1,7 @@
 {
-    "block.cardboardbox.cardboard_box": "Χάρτινο κουτί",
-    "block.cardboardbox.cardboard_box.inventoryFull": "Φαίνεται πως το απόθεμά σου είναι γεμάτο",
-    "block.cardboardbox.cardboard_box.banned.block": "Δεν νομίζω πως μπορώ να μεταφέρω αυτό το μπλοκ",
-    "block.cardboardbox.cardboard_box.banned.tile": "Δεν νομίζω πως μπορώ να μεταφέρω αυτό το μπλοκ μαζί με το περιεχόμενό του"
+    "block.cardboardbox.cardboard_box":  "Χάρτινο κουτί",
+    "block.cardboardbox.cardboard_box.inventoryFull":  "Φαίνεται πως το απόθεμά σου είναι γεμάτο",
+    "block.cardboardbox.cardboard_box.banned.block":  "Δεν νομίζω πως μπορώ να μεταφέρω αυτό το μπλοκ",
+    "block.cardboardbox.cardboard_box.banned.tile":  "Δεν νομίζω πως μπορώ να μεταφέρω αυτό το μπλοκ μαζί με το περιεχόμενό του",
+    "block.cardboardbox.cardboard_box.notWhitelisted":  "This block is not allowed by the cardboard box whitelist"
 }

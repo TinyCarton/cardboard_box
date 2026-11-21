@@ -21,9 +21,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
  *     <li>方块层 {@link #blockBanList}：整个世界都不许搬（活塞、信标、潜影盒……）</li>
  *     <li>方块实体层 {@link #blockEntityBanList}：类型不允许（例如刷怪笼 BE）</li>
  * </ul>
- * 另外配置会把 Minecraft/其他 mod 的所有方块实体自动列成开关
- * （见 {@code ModHandler#buildConfig}，落在 {@code config/cardboardbox-common.toml}），
- * 玩家可在 config 里逐个放开。
+ * 另外 {@code mods.toml} 里的配置会把 Minecraft/其他 mod 的所有方块实体自动列成开关
+ * （见 {@code ModHandler#buildConfig}），玩家可在 config 里逐个放开。
  * <p>
  * 注意：<b>没有方块实体的普通方块默认也可以装</b>，此时只保存方块状态。
  */
@@ -39,6 +38,11 @@ public class HandlerManager {
     public static final List<BlockEntityType<?>> blockEntityBanList = new ArrayList<>();
     /** 被禁用的方块 */
     public static final List<Block> blockBanList = new ArrayList<>();
+
+    /** 是否启用白名单（默认启用） */
+    public static boolean whitelistEnabled = true;
+    /** 是否启用黑名单（默认禁用） */
+    public static boolean blacklistEnabled = false;
 
     /** 为某个方块实体类注册处理器（预留） */
     public void registerPickupHandler(Class<? extends BlockEntity> clazz, Handler handler) {
@@ -71,19 +75,33 @@ public class HandlerManager {
     /**
      * 判断某个位置能否装进纸箱。
      * <p>
-     * 任何方块都可以装，只有黑名单会拦截；方块实体只影响额外数据是否保存。
+     * 判定顺序：
+     * <ol>
+     *     <li>黑名单（启用时）优先——同时命中黑白名单的方块按黑名单处理</li>
+     *     <li>白名单（启用时）——不在名单内的方块被拒绝</li>
+     *     <li>其余方块允许，没有方块实体的只保存方块状态</li>
+     * </ol>
      *
      * @see BoxBlockItem#tryToPickupBlock
      */
     public CanPickUpResult canPickUp(Level world, BlockPos pos) {
         Block block = world.getBlockState(pos).getBlock();
-        if (blockBanList.contains(block)) {
-            return CanPickUpResult.BANNED_BLOCK;
+
+        // 黑名单优先级高于白名单
+        if (blacklistEnabled) {
+            if (blockBanList.contains(block)) {
+                return CanPickUpResult.BANNED_BLOCK;
+            }
+            BlockEntity blockEntity = world.getBlockEntity(pos);
+            if (blockEntity != null && blockEntityBanList.contains(blockEntity.getType())) {
+                return CanPickUpResult.BANNED_BLOCK_ENTITY;
+            }
         }
-        BlockEntity blockEntity = world.getBlockEntity(pos);
-        if (blockEntity != null && blockEntityBanList.contains(blockEntity.getType())) {
-            return CanPickUpResult.BANNED_BLOCK_ENTITY;
+
+        if (whitelistEnabled && !WhitelistManager.isAllowed(block)) {
+            return CanPickUpResult.NOT_WHITELISTED;
         }
+
         return CanPickUpResult.CAN_PICK_UP;
     }
 }
