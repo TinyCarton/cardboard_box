@@ -93,6 +93,23 @@ public class CreateHandler extends ModHandler {
 名字带 `cable` / `wire` / `pipe` / `tube` / `conduit` / `channel` 的默认禁用，其余默认允许；
 `BlackListSettings.BlackListMobSpawners` 控制刷怪笼。方块层黑名单见 `VanillaHandler`。
 
+## 本分支：Forge 实现
+
+`forge` 分支只放 Forge 实现，构建与运行全部围绕 ForgeGradle 6 / Forge 47.x：
+
+| 关注点 | 本分支的实现 |
+| --- | --- |
+| 依赖 | `net.minecraftforge:forge:1.20.1-47.4.29`、Gradle 8.6、JDK 17 |
+| 映射 | Mojang official（ForgeGradle 自带，不依赖 parchment） |
+| 入口 | `@Mod(Cardboardboxes.DOMAIN)` + `FMLJavaModLoadingContext` 事件总线 |
+| 配置 | `ForgeConfigSpec` + `ModLoadingContext.registerConfig(COMMON, ...)` |
+| 软依赖 | `ModList.get().isLoaded(modId)`，未加载时跳过对应 `ModHandler` |
+| 创造模式栏 | `BuildCreativeModeTabContentsEvent` |
+| 保护类 mod 兼容 | 拾取前发 `BlockEvent.BreakEvent`；放置前走 `ForgeEventFactory.onBlockPlace`，两者被取消时不消耗纸箱 |
+| 元数据 | `src/main/resources/META-INF/mods.toml`，`modLoader = "javafml"` |
+
+其他加载器实现在 `fabric-1.20.1` / `neoforge-1.20.1` 分支；改动核心逻辑（`box/`、`handler/`）时注意各分支同步。
+
 ## 移植到其他版本 / 加载器
 
 核心逻辑只依赖 `Block` / `BlockEntity` / `BlockItem` 的生命周期，需要改的是注册层与事件层：
