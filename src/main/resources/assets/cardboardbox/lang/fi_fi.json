@@ -1,8 +1,7 @@
 {
     "block.cardboardbox.cardboard_box":  "Pahvilaatikko",
     "block.cardboardbox.cardboard_box.inventoryFull":  "Varastosi näyttää olevan täynnä",
-    "block.cardboardbox.cardboard_box.banned.block":  "En usko, että pystyn kantamaan tuota lohkoa",
+    "block.cardboardbox.cardboard_box.banned.block":  "This block doesn\u0027t seem to fit",
     "block.cardboardbox.cardboard_box.banned.tile":  "En usko, että pystyn kantamaan tuota lohkoa sisältöineen",
-    "block.cardboardbox.cardboard_box.notWhitelisted":  "This block is not allowed by the cardboard box whitelist",
-    "item.cardboardbox.cardboard_box":  "Pahvilaatikko"
+    "block.cardboardbox.cardboard_box.notWhitelisted":  "This block is not allowed by the cardboard box whitelist"
 }

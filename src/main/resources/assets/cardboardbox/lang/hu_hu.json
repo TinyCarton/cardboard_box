@@ -1,8 +1,7 @@
 {
     "block.cardboardbox.cardboard_box":  "Kartondoboz",
     "block.cardboardbox.cardboard_box.inventoryFull":  "Úgy tűnik, tele van a hátizsákod",
-    "block.cardboardbox.cardboard_box.banned.block":  "Nem hiszem, hogy el tudom vinni azt a blokkot",
+    "block.cardboardbox.cardboard_box.banned.block":  "This block doesn\u0027t seem to fit",
     "block.cardboardbox.cardboard_box.banned.tile":  "Nem hiszem, hogy el tudom vinni azt a blokkot a tartalmával együtt",
-    "block.cardboardbox.cardboard_box.notWhitelisted":  "This block is not allowed by the cardboard box whitelist",
-    "item.cardboardbox.cardboard_box":  "Kartondoboz"
+    "block.cardboardbox.cardboard_box.notWhitelisted":  "This block is not allowed by the cardboard box whitelist"
 }

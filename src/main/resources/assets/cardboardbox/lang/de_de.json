@@ -1,8 +1,7 @@
 {
     "block.cardboardbox.cardboard_box":  "Karton",
     "block.cardboardbox.cardboard_box.inventoryFull":  "Dein Inventar scheint voll zu sein",
-    "block.cardboardbox.cardboard_box.banned.block":  "Ich glaube nicht, dass ich diesen Block tragen kann",
+    "block.cardboardbox.cardboard_box.banned.block":  "This block doesn\u0027t seem to fit",
     "block.cardboardbox.cardboard_box.banned.tile":  "Ich glaube nicht, dass ich diesen Block mit seinem Inhalt tragen kann",
-    "block.cardboardbox.cardboard_box.notWhitelisted":  "This block is not allowed by the cardboard box whitelist",
-    "item.cardboardbox.cardboard_box":  "Karton"
+    "block.cardboardbox.cardboard_box.notWhitelisted":  "This block is not allowed by the cardboard box whitelist"
 }

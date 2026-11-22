@@ -1,8 +1,7 @@
 {
     "block.cardboardbox.cardboard_box":  "صندوق كرتوني",
     "block.cardboardbox.cardboard_box.inventoryFull":  "يبدو أن حقيبتك ممتلئة",
-    "block.cardboardbox.cardboard_box.banned.block":  "لا أظن أنني أستطيع حمل ذلك المكعب",
+    "block.cardboardbox.cardboard_box.banned.block":  "This block doesn\u0027t seem to fit",
     "block.cardboardbox.cardboard_box.banned.tile":  "لا أظن أنني أستطيع حمل ذلك المكعب مع محتوياته",
-    "block.cardboardbox.cardboard_box.notWhitelisted":  "This block is not allowed by the cardboard box whitelist",
-    "item.cardboardbox.cardboard_box":  "صندوق كرتوني"
+    "block.cardboardbox.cardboard_box.notWhitelisted":  "This block is not allowed by the cardboard box whitelist"
 }

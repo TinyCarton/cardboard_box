@@ -1,8 +1,7 @@
 {
     "block.cardboardbox.cardboard_box":  "Картонная коробка",
     "block.cardboardbox.cardboard_box.inventoryFull":  "Похоже, ваш инвентарь полон",
-    "block.cardboardbox.cardboard_box.banned.block":  "Не думаю, что смогу унести этот блок",
+    "block.cardboardbox.cardboard_box.banned.block":  "This block doesn\u0027t seem to fit",
     "block.cardboardbox.cardboard_box.banned.tile":  "Не думаю, что смогу унести этот блок вместе с содержимым",
-    "block.cardboardbox.cardboard_box.notWhitelisted":  "This block is not allowed by the cardboard box whitelist",
-    "item.cardboardbox.cardboard_box":  "Картонная коробка"
+    "block.cardboardbox.cardboard_box.notWhitelisted":  "This block is not allowed by the cardboard box whitelist"
 }
