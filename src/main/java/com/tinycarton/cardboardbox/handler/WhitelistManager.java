@@ -57,7 +57,7 @@ public final class WhitelistManager {
     private static void generateDefaults() {
         Set<ResourceLocation> defaults = new LinkedHashSet<>();
         for (ResourceLocation id : BuiltInRegistries.BLOCK.keySet()) {
-            Block block = BuiltInRegistries.BLOCK.get(id);
+            Block block = BuiltInRegistries.BLOCK.get(id).map(ref -> ref.value()).orElse(null);
             if (block != null && block.defaultBlockState().hasBlockEntity()) {
                 defaults.add(id);
             }
