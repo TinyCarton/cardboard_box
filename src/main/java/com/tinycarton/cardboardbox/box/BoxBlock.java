@@ -100,7 +100,18 @@ public class BoxBlock extends BaseEntityBlock {
         if (level.isClientSide) {
             return InteractionResult.PASS;
         }
+        return useBox(level, pos, player) ? InteractionResult.SUCCESS : InteractionResult.PASS;
+    }
 
+    /**
+     * 右键纸箱的核心逻辑，供 1.20.4 及以下的 {@code use} 覆盖和 Forge 事件共用。
+     * <p>
+     * 1.20.5+ 的 {@code use} 被 {@code useItemOn} 取代，覆盖不再生效，
+     * 因此这条路必须能被事件直接调用。
+     *
+     * @return 是否已处理
+     */
+    public boolean useBox(Level level, BlockPos pos, Player player) {
         boolean hasContent = level.getBlockEntity(pos) instanceof BoxBlockEntity boxBlockEntity
                 && boxBlockEntity.getStateForPlacement() != null;
 
@@ -109,20 +120,20 @@ public class BoxBlock extends BaseEntityBlock {
             ItemStack stack = toItemStack(level, pos);
             if (stack == null) {
                 player.displayClientMessage(Component.translatable(CardboardBox.BOX_BLOCK.get().getDescriptionId() + ".error.stack.null"), true);
-                return InteractionResult.PASS;
+                return false;
             }
             if (!player.getInventory().add(stack)) {
                 player.displayClientMessage(Component.translatable(CardboardBox.BOX_BLOCK.get().getDescriptionId() + ".inventoryFull"), true);
-                return InteractionResult.PASS;
+                return false;
             }
             player.getInventory().setChanged();
             // removeBlock 内部使用 flag 3，会触发周围方块的邻居更新
             level.removeBlock(pos, false);
-            return InteractionResult.SUCCESS;
+            return true;
         }
 
         // 普通右键：只取下纸箱，内容方块留在原位
-        return restoreStoredBlock(level, pos, player) ? InteractionResult.SUCCESS : InteractionResult.PASS;
+        return restoreStoredBlock(level, pos, player);
     }
 
     /**
@@ -130,8 +141,7 @@ public class BoxBlock extends BaseEntityBlock {
      *
      * @return 是否成功还原（纸箱为空时返回 false）
      */
-    private boolean restoreStoredBlock(Level level, BlockPos pos, Player player) {
-        if (!(level.getBlockEntity(pos) instanceof BoxBlockEntity boxBlockEntity) || boxBlockEntity.getStateForPlacement() == null) {
+    public boolean restoreStoredBlock(Level level, BlockPos pos, Player player) {        if (!(level.getBlockEntity(pos) instanceof BoxBlockEntity boxBlockEntity) || boxBlockEntity.getStateForPlacement() == null) {
             return false;
         }
         // 1) 把纸箱位置换回原来的方块（UPDATE_ALL：通知客户端并触发周围方块的邻居更新）
@@ -143,7 +153,7 @@ public class BoxBlock extends BaseEntityBlock {
         if (compound != null) {
             BlockEntity blockEntity = level.getBlockEntity(pos);
             if (blockEntity != null) {
-                blockEntity.load(compound);
+                com.tinycarton.cardboardbox.compat.Compat.loadBlockEntity(blockEntity, compound, level.registryAccess());
             }
         }
         // 3) 让周围方块重新评估（红石、栅栏连接、上方方块的支撑判定）
@@ -171,12 +181,14 @@ public class BoxBlock extends BaseEntityBlock {
 
         if (level.getBlockEntity(pos) instanceof BoxBlockEntity blockEntity) {
             if (blockEntity.getStateForPlacement() != null) {
-                stack.setTag(new CompoundTag());
-                // 方块状态用全局 id 存，反序列化时用 Block.stateById 还原（含全部属性）
-                stack.getTag().putInt(STORE_ITEM_TAG, Block.getId(blockEntity.getStateForPlacement()));
+                CompoundTag tag = new CompoundTag();
+                // 方块状态用全局 id 存，反序列化时用 Block.stateById 还原
+                tag.putInt(STORE_ITEM_TAG, Block.getId(blockEntity.getStateForPlacement()));
                 if (blockEntity.getDataForPlacement() != null) {
-                    stack.getTag().put(BLOCK_ENTITY_DATA_TAG, blockEntity.getDataForPlacement());
+                    tag.put(BLOCK_ENTITY_DATA_TAG, blockEntity.getDataForPlacement());
                 }
+                // 1.20.4 及以下写 NBT，1.20.5+ 写 DataComponents（由 Compat 分流）
+                com.tinycarton.cardboardbox.compat.Compat.setTag(stack, tag);
             } else {
                 CardboardBox.LOGGER.warn("Box at {} has no stored state while being converted to an item", pos);
             }

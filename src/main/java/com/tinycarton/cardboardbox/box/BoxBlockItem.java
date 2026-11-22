@@ -78,14 +78,14 @@ public class BoxBlockItem extends BlockItem {
      * 步骤：校验黑名单 → 抓 BlockState → 抓 BE 的 saveWithId（可能为 null）→ 移除原 BE
      * → 放上纸箱方块并触发方块更新 → 把数据塞进纸箱 BE → 消耗一个箱子物品。
      */
-    protected InteractionResult tryToPickupBlock(Player player, Level level, BlockPos pos, InteractionHand hand) {
+    public InteractionResult tryToPickupBlock(Player player, Level level, BlockPos pos, InteractionHand hand) {
         CanPickUpResult result = HandlerManager.INSTANCE.canPickUp(level, pos);
 
         if (result == CanPickUpResult.CAN_PICK_UP) {
             final BlockState state = level.getBlockState(pos).getBlock().defaultBlockState();
             final BlockEntity blockEntity = level.getBlockEntity(pos);
             // 普通方块没有方块实体，此时只保存方块状态
-            final CompoundTag tag = blockEntity != null ? blockEntity.saveWithId() : null;
+            final CompoundTag tag = blockEntity != null ? com.tinycarton.cardboardbox.compat.Compat.saveBlockEntity(blockEntity, level.registryAccess()) : null;
 
             // 先移除旧 BE，再替换方块，避免旧 BE 残留
             level.removeBlockEntity(pos);
@@ -173,7 +173,7 @@ public class BoxBlockItem extends BlockItem {
                         if (handler != null) {
                             handler.loadData(blockEntity, storedBlockEntityData);
                         } else {
-                            blockEntity.load(storedBlockEntityData);
+                            com.tinycarton.cardboardbox.compat.Compat.loadBlockEntity(blockEntity, storedBlockEntityData, context.getLevel().registryAccess());
                         }
                     }
                 }
@@ -201,28 +201,28 @@ public class BoxBlockItem extends BlockItem {
     @Override
     public int getMaxStackSize(ItemStack stack) {
         // 装了东西的箱子不能叠加，空箱可以叠 64
-        return stack.hasTag() ? 1 : 64;
+        return com.tinycarton.cardboardbox.compat.Compat.hasTag(stack) ? 1 : 64;
     }
 
     @Override
     public void appendHoverText(ItemStack stack, Level worldIn, List<Component> tooltip, TooltipFlag flagIn) {
-        if (stack.getTag() != null && stack.getTag().contains(STORE_ITEM_TAG)) {
-            BlockState state = Block.stateById(stack.getTag().getInt(STORE_ITEM_TAG));
+        if (com.tinycarton.cardboardbox.compat.Compat.getTag(stack) != null && com.tinycarton.cardboardbox.compat.Compat.getTag(stack).contains(STORE_ITEM_TAG)) {
+            BlockState state = Block.stateById(com.tinycarton.cardboardbox.compat.Compat.getTag(stack).getInt(STORE_ITEM_TAG));
             tooltip.add(Component.translatable(state.getBlock().getDescriptionId()));
         }
     }
 
     /** @return 物品里存的方块状态；没有内容返回空气状态 */
     public BlockState getStoredBlock(ItemStack stack) {
-        return stack.getTag() != null && stack.getTag().contains(STORE_ITEM_TAG)
-                ? Block.stateById(stack.getTag().getInt(STORE_ITEM_TAG))
+        return com.tinycarton.cardboardbox.compat.Compat.getTag(stack) != null && com.tinycarton.cardboardbox.compat.Compat.getTag(stack).contains(STORE_ITEM_TAG)
+                ? Block.stateById(com.tinycarton.cardboardbox.compat.Compat.getTag(stack).getInt(STORE_ITEM_TAG))
                 : Blocks.AIR.defaultBlockState();
     }
 
     /** @return 物品里存的方块实体 NBT；方块没有方块实体时返回 null */
     public CompoundTag getStoredBlockEntityData(ItemStack stack) {
-        return stack.getTag() != null && stack.getTag().contains(BLOCK_ENTITY_DATA_TAG)
-                ? stack.getTag().getCompound(BLOCK_ENTITY_DATA_TAG)
+        return com.tinycarton.cardboardbox.compat.Compat.getTag(stack) != null && com.tinycarton.cardboardbox.compat.Compat.getTag(stack).contains(BLOCK_ENTITY_DATA_TAG)
+                ? com.tinycarton.cardboardbox.compat.Compat.getTag(stack).getCompound(BLOCK_ENTITY_DATA_TAG)
                 : null;
     }
 }
