@@ -55,6 +55,6 @@ public class CardboardBox implements ModInitializer {
 
     /** 生成本模组命名空间下的 {@link ResourceLocation} */
     public static ResourceLocation id(String path) {
-        return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+        return new ResourceLocation(MOD_ID, path);
     }
 }
