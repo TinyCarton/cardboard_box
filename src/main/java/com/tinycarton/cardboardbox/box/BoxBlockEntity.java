@@ -32,9 +32,9 @@ public class BoxBlockEntity extends BlockEntity {
     protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag, registries);
         if (tag.contains("storedTile")) {
-            setStateForPlacement(Block.stateById(tag.getInt("storedTile")));
+            setStateForPlacement(Block.stateById(tag.getInt("storedTile").orElse(0)));
             if (tag.contains("tileData")) {
-                setDataForPlacement(tag.getCompound("tileData"));
+                setDataForPlacement(tag.getCompound("tileData").orElse(null));
             }
         }
     }

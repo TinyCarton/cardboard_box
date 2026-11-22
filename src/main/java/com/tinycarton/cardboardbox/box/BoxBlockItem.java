@@ -156,7 +156,7 @@ public class BoxBlockItem extends BlockItem {
                 heldItemStack.shrink(1);
 
                 if (!context.getPlayer().isCreative() && !context.getPlayer().getInventory().add(new ItemStack(getBlock()))) {
-                    context.getPlayer().spawnAtLocation(new ItemStack(getBlock()), 0F);
+                    context.getPlayer().drop(new ItemStack(getBlock()), false);
                 }
             }
             return InteractionResult.SUCCESS;
@@ -165,10 +165,10 @@ public class BoxBlockItem extends BlockItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, net.minecraft.world.item.component.TooltipDisplay display, java.util.function.Consumer<Component> tooltip, TooltipFlag flagIn) {
         BlockState state = getStoredBlock(stack);
         if (state.getBlock() != Blocks.AIR) {
-            tooltip.add(Component.translatable(state.getBlock().getDescriptionId()));
+            tooltip.accept(Component.translatable(state.getBlock().getDescriptionId()));
         }
     }
 
@@ -176,7 +176,7 @@ public class BoxBlockItem extends BlockItem {
     public BlockState getStoredBlock(ItemStack stack) {
         CompoundTag tag = getStoredTag(stack);
         return tag != null && tag.contains(STORE_ITEM_TAG)
-                ? Block.stateById(tag.getInt(STORE_ITEM_TAG))
+                ? Block.stateById(tag.getInt(STORE_ITEM_TAG).orElse(0))
                 : Blocks.AIR.defaultBlockState();
     }
 
@@ -184,7 +184,7 @@ public class BoxBlockItem extends BlockItem {
     public CompoundTag getStoredBlockEntityData(ItemStack stack) {
         CompoundTag tag = getStoredTag(stack);
         return tag != null && tag.contains(BLOCK_ENTITY_DATA_TAG)
-                ? tag.getCompound(BLOCK_ENTITY_DATA_TAG)
+                ? tag.getCompound(BLOCK_ENTITY_DATA_TAG).orElse(null)
                 : null;
     }
 
