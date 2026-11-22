@@ -53,6 +53,11 @@ public class BoxBlock extends BaseEntityBlock {
         registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH));
     }
 
+    /** 1.20.3+ 的 BaseEntityBlock 抽象方法 */
+    protected com.mojang.serialization.MapCodec<? extends BaseEntityBlock> codec() {
+        return com.mojang.serialization.MapCodec.unit(this);
+    }
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);
