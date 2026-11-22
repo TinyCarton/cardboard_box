@@ -55,6 +55,11 @@ public class BoxBlock extends BaseEntityBlock {
         registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH));
     }
 
+    /** 1.20.3+ 的 BaseEntityBlock 抽象方法；1.20.2 及以下编译时只是一个普通方法 */
+    public com.mojang.serialization.MapCodec<? extends BaseEntityBlock> codec() {
+        return com.mojang.serialization.MapCodec.unit(this);
+    }
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);
@@ -199,7 +204,6 @@ public class BoxBlock extends BaseEntityBlock {
     /**
      * 创造模式中键取方块 / 结构方块保存时使用，保证复制出来的物品也带内容。
      */
-    @Override
     public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
         return toItemStack(level, pos);
     }
