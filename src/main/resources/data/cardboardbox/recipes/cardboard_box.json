@@ -6,15 +6,15 @@
       "item": "minecraft:paper"
     },
     "S": {
-      "tag": "forge:slimeballs"
+      "item": "minecraft:slime_ball"
     },
-    "W": {
-      "tag": "minecraft:logs"
+    "L": {
+      "tag": "cardboardbox:stripped_logs"
     }
   },
   "pattern": [
-    "PPP",
-    "SWS",
+    "PSP",
+    "PLP",
     "PPP"
   ],
   "result": {
