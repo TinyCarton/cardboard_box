@@ -1,7 +1,7 @@
 {
     "block.cardboardbox.cardboard_box":  "紙箱",
     "block.cardboardbox.cardboard_box.inventoryFull":  "君之囊橐似已盈滿",
-    "block.cardboardbox.cardboard_box.banned.block":  "此方似不可舉",
+    "block.cardboardbox.cardboard_box.banned.block":  "此方恐難納入箱中",
     "block.cardboardbox.cardboard_box.banned.tile":  "此方之器似不可舉",
     "block.cardboardbox.cardboard_box.notWhitelisted":  "此方不在紙箱白名單之中"
 }
