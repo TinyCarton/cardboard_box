@@ -82,7 +82,7 @@ public class BoxBlockItem extends BlockItem {
         CanPickUpResult result = HandlerManager.INSTANCE.canPickUp(level, pos);
 
         if (result == CanPickUpResult.CAN_PICK_UP) {
-            final BlockState state = level.getBlockState(pos);
+            final BlockState state = level.getBlockState(pos).getBlock().defaultBlockState();
             final BlockEntity blockEntity = level.getBlockEntity(pos);
             CompoundTag tag = null;
             if (blockEntity != null) {
@@ -134,7 +134,7 @@ public class BoxBlockItem extends BlockItem {
                 && context.getLevel().getBlockState(pos).canBeReplaced()) {
             Handler handler = HandlerManager.INSTANCE.getHandler(storedBlockState.getBlock());
 
-            BlockState stateToPlace = storedBlockState;
+            BlockState stateToPlace = storedBlockState.getBlock().defaultBlockState();
             if (!storedBlockState.canSurvive(context.getLevel(), pos)) {
                 BlockState adjusted = storedBlockState.getBlock().getStateForPlacement(context);
                 if (adjusted != null) {
