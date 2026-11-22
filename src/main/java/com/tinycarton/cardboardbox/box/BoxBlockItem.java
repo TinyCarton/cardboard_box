@@ -82,7 +82,8 @@ public class BoxBlockItem extends BlockItem {
         CanPickUpResult result = HandlerManager.INSTANCE.canPickUp(level, pos);
 
         if (result == CanPickUpResult.CAN_PICK_UP) {
-            final BlockState state = level.getBlockState(pos);
+            // 只保留方块类型：丢弃朝向、含水等状态，避免装回时产生非法或朝向错乱的方块
+            final BlockState state = level.getBlockState(pos).getBlock().defaultBlockState();
             final BlockEntity blockEntity = level.getBlockEntity(pos);
             // 普通方块没有方块实体，此时只保存方块状态
             final CompoundTag tag = blockEntity != null ? blockEntity.saveWithId() : null;
@@ -215,7 +216,8 @@ public class BoxBlockItem extends BlockItem {
     /** @return 物品里存的方块状态；没有内容返回空气状态 */
     public BlockState getStoredBlock(ItemStack stack) {
         return stack.getTag() != null && stack.getTag().contains(STORE_ITEM_TAG)
-                ? Block.stateById(stack.getTag().getInt(STORE_ITEM_TAG))
+                // 旧存档里可能存了带朝向/含水的状态，这里统一净化成默认状态
+                ? Block.stateById(stack.getTag().getInt(STORE_ITEM_TAG)).getBlock().defaultBlockState()
                 : Blocks.AIR.defaultBlockState();
     }
 
