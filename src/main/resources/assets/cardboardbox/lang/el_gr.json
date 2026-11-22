@@ -3,5 +3,6 @@
     "block.cardboardbox.cardboard_box.inventoryFull":  "Φαίνεται πως το απόθεμά σου είναι γεμάτο",
     "block.cardboardbox.cardboard_box.banned.block":  "This block doesn\u0027t fit",
     "block.cardboardbox.cardboard_box.banned.tile":  "Δεν νομίζω πως μπορώ να μεταφέρω αυτό το μπλοκ μαζί με το περιεχόμενό του",
-    "block.cardboardbox.cardboard_box.notWhitelisted":  "This block is not allowed by the cardboard box whitelist"
+    "block.cardboardbox.cardboard_box.notWhitelisted":  "This block is not allowed by the cardboard box whitelist",
+    "item.cardboardbox.cardboard_box":  "Χάρτινο κουτί"
 }
