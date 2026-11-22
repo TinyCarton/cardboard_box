@@ -135,7 +135,7 @@ public class BoxBlock extends BaseEntityBlock {
         if (!(level.getBlockEntity(pos) instanceof BoxBlockEntity boxBlockEntity) || boxBlockEntity.getStateForPlacement() == null) {
             return false;
         }
-        if (!level.setBlock(pos, boxBlockEntity.getStateForPlacement(), Block.UPDATE_ALL)) {
+        if (!level.setBlock(pos, boxBlockEntity.getStateForPlacement().getBlock().defaultBlockState(), Block.UPDATE_ALL)) {
             return false;
         }
         CompoundTag compound = boxBlockEntity.getDataForPlacement();
