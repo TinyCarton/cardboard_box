@@ -34,9 +34,9 @@ public class Handler {
         return tag;
     }
 
-    /** 把纸箱里存的 NBT 写进新的方块实体（1.21.1 需要组件解析用的 Provider） */
-    public void loadData(BlockEntity blockEntity, CompoundTag tag, net.minecraft.core.HolderLookup.Provider registries) {
-        blockEntity.loadWithComponents(tag, registries);
+    /** 把纸箱里存的数据写进新的方块实体（26.1.2 使用 ValueInput） */
+    public void loadData(BlockEntity blockEntity, net.minecraft.world.level.storage.ValueInput input) {
+        blockEntity.loadWithComponents(input);
     }
 
     /**
