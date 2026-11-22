@@ -1,7 +1,7 @@
 {
     "block.cardboardbox.cardboard_box":  "กล่องกระดาษแข็ง",
     "block.cardboardbox.cardboard_box.inventoryFull":  "ดูเหมือนว่ากระเป๋าของคุณจะเต็ม",
-    "block.cardboardbox.cardboard_box.banned.block":  "This block doesn\u0027t seem to fit",
+    "block.cardboardbox.cardboard_box.banned.block":  "This block doesn\u0027t fit",
     "block.cardboardbox.cardboard_box.banned.tile":  "ฉันไม่คิดว่าจะยกบล็อกนั้นพร้อมของข้างในได้",
     "block.cardboardbox.cardboard_box.notWhitelisted":  "This block is not allowed by the cardboard box whitelist"
 }
