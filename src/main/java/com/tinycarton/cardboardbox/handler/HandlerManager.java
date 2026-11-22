@@ -87,6 +87,13 @@ public class HandlerManager {
     public CanPickUpResult canPickUp(Level world, BlockPos pos) {
         Block block = world.getBlockState(pos).getBlock();
 
+        // 硬编码：纸箱不能装纸箱。
+        // 套娃会让 NBT 每层嵌套一次，最终把数据撑爆（甚至会拖垮存档读写），
+        // 因此这条限制写死在代码里，不受白名单/黑名单配置影响。
+        if (block instanceof com.tinycarton.cardboardbox.box.BoxBlock) {
+            return CanPickUpResult.BANNED_BLOCK;
+        }
+
         // 黑名单优先级高于白名单
         if (blacklistEnabled) {
             if (blockBanList.contains(block)) {
