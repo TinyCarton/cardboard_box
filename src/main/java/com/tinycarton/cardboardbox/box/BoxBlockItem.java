@@ -44,7 +44,11 @@ import net.minecraft.world.level.block.state.BlockState;
 public class BoxBlockItem extends BlockItem {
 
     public BoxBlockItem(Block block) {
-        super(block, new Item.Properties());
+        this(block, new Item.Properties());
+    }
+
+    public BoxBlockItem(Block block, Item.Properties properties) {
+        super(block, properties);
     }
 
     @Override
