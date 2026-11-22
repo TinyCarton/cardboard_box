@@ -1,8 +1,5 @@
 package com.tinycarton.cardboardbox;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.tinycarton.cardboardbox.box.BoxBlock;
 import com.tinycarton.cardboardbox.box.BoxBlockEntity;
 import com.tinycarton.cardboardbox.box.BoxBlockItem;
@@ -10,89 +7,88 @@ import com.tinycarton.cardboardbox.handler.HandlerManager;
 import com.tinycarton.cardboardbox.mods.ModHandler;
 import com.tinycarton.cardboardbox.mods.VanillaHandler;
 
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * 模组主类：注册纸箱方块、方块实体与物品，并在通用初始化阶段装载搬运黑名单。
+ * 模组主类：注册纸箱方块、方块实体与物品，并装载搬运白名单 / 黑名单。
  * <p>
- * 纸箱 = 带一个"待还原方块状态 + 待还原 NBT"的 BlockEntity：
- * <ul>
- *     <li>空箱右键方块：把目标方块换成纸箱，方块状态与（如果有的）方块实体 NBT 存进纸箱 BE</li>
- *     <li>带内容纸箱右键地面：把纸箱换回原方块并写回 NBT</li>
- *     <li>装好的纸箱物品只用 ItemStack NBT 记录内容，可以放进背包、箱子、漏斗</li>
- * </ul>
+ * NeoForge 1.20.2 起包名从 {@code net.minecraftforge} 改为 {@code net.neoforged}。
+ * 这里用通用的 {@link DeferredRegister}（而不是 1.20.4+ 才有的 Blocks/Items 便捷子类），
+ * 同一份代码也能在 1.20.3/1.20.4 上编译。
  */
-@Mod(CardboardBox.DOMAIN)
+@Mod(CardboardBox.MOD_ID)
 public class CardboardBox {
     /** 模组 id，同时也是所有注册名的命名空间 */
-    public static final String DOMAIN = "cardboardbox";
-    public static final Logger LOGGER = LogManager.getLogger();
+    public static final String MOD_ID = "cardboardbox";
+    public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+
+    // ===== 注册器 =====
+    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(BuiltInRegistries.BLOCK, MOD_ID);
+    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(BuiltInRegistries.ITEM, MOD_ID);
+    public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES =
+            DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, MOD_ID);
 
     // ===== 方块 =====
-    public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, DOMAIN);
-    public static final RegistryObject<BoxBlock> BOX_BLOCK = BLOCKS.register("cardboard_box", BoxBlock::new);
+    public static final DeferredHolder<Block, BoxBlock> BOX_BLOCK = BLOCKS.register("cardboard_box", () -> new BoxBlock());
 
     // ===== 方块实体 =====
-    public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, DOMAIN);
-    /**
-     * 纸箱方块实体。{@code BlockEntityType} 必须把纸箱方块登记为有效方块，
-     * 否则区块重新加载时 {@code isValid} 校验失败，纸箱里的内容会被丢弃。
-     */
-    public static final RegistryObject<BlockEntityType<BoxBlockEntity>> BOX_BLOCK_ENTITY_TYPE = BLOCK_ENTITY_TYPES.register("box",
-            () -> BlockEntityType.Builder.of(BoxBlockEntity::new, BOX_BLOCK.get()).build(null));
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BoxBlockEntity>> BOX_BLOCK_ENTITY_TYPE =
+            BLOCK_ENTITY_TYPES.register("box",
+                    () -> BlockEntityType.Builder.of(BoxBlockEntity::new, BOX_BLOCK.get()).build(null));
 
     // ===== 物品 =====
-    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, DOMAIN);
-    public static final RegistryObject<BoxBlockItem> BOX_ITEM = ITEMS.register("cardboard_box", () -> new BoxBlockItem(BOX_BLOCK.get()));
+    public static final DeferredHolder<Item, BoxBlockItem> BOX_ITEM =
+            ITEMS.register("cardboard_box", () -> new BoxBlockItem(BOX_BLOCK.get()));
 
-    /** 通用配置：自动生成的所有方块实体黑名单 + 各 mod 处理器选项 */
-    private static ForgeConfigSpec config;
+    public CardboardBox(IEventBus modBus, ModContainer container) {
+        BLOCKS.register(modBus);
+        ITEMS.register(modBus);
+        BLOCK_ENTITY_TYPES.register(modBus);
 
-    public CardboardBox() {
-        IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, ModHandler.buildHandlerData());
 
-        modBus.addListener(this::setup);
-        modBus.addListener(this::onCreativeModeTabBuildContents);
-
-        // 注册内置的 minecraft 处理器（黑名单 + 箱子朝向修正）
         ModHandler.modSupportHandlerMap.put("minecraft", VanillaHandler.class);
 
-        // 配置必须在注册表可用之前构建（黑名单要遍历 BLOCK_ENTITY_TYPES 注册表）
-        config = ModHandler.buildHandlerData();
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, config);
-        LOGGER.info("Finished building the config -> {}", config);
-
-        BLOCKS.register(modBus);
-        BLOCK_ENTITY_TYPES.register(modBus);
-        ITEMS.register(modBus);
+        modBus.addListener(this::onCommonSetup);
+        modBus.addListener(this::onBuildCreativeTab);
     }
 
-    private void setup(final FMLCommonSetupEvent e) {
-        // 纸箱自己不能被装进纸箱（防止无限套娃 / 存档膨胀）
-        HandlerManager.INSTANCE.banBlock(BOX_BLOCK.get());
-        HandlerManager.INSTANCE.banBlockEntity(BOX_BLOCK_ENTITY_TYPE.get());
-
-        // 读取配置并应用黑名单
-        ModHandler.loadHandlerData(config);
+    /**
+     * 注册完成 + 配置加载后：登记纸箱自身到黑名单，并装载各 mod 适配器与白名单。
+     */
+    private void onCommonSetup(FMLCommonSetupEvent event) {
+        event.enqueueWork(() -> {
+            HandlerManager.INSTANCE.banBlock(BOX_BLOCK.get());
+            HandlerManager.INSTANCE.banBlockEntity(BOX_BLOCK_ENTITY_TYPE.get());
+            ModHandler.loadHandlerData();
+        });
     }
 
-    private void onCreativeModeTabBuildContents(BuildCreativeModeTabContentsEvent event) {
+    /** 把纸箱放进"功能方块"创造栏 */
+    private void onBuildCreativeTab(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey() == CreativeModeTabs.FUNCTIONAL_BLOCKS) {
             event.accept(BOX_ITEM.get());
         }
+    }
+
+    /** 生成本模组命名空间下的 {@link ResourceLocation} */
+    public static ResourceLocation id(String path) {
+        return new ResourceLocation(MOD_ID, path);
     }
 }
