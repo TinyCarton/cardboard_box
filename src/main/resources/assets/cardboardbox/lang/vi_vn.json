@@ -1,7 +1,7 @@
 {
     "block.cardboardbox.cardboard_box":  "Thùng các tông",
     "block.cardboardbox.cardboard_box.inventoryFull":  "Có vẻ như túi của bạn đã đầy",
-    "block.cardboardbox.cardboard_box.banned.block":  "This block doesn\u0027t seem to fit",
+    "block.cardboardbox.cardboard_box.banned.block":  "This block doesn\u0027t fit",
     "block.cardboardbox.cardboard_box.banned.tile":  "Tôi không nghĩ mình có thể mang khối đó cùng với nội dung",
     "block.cardboardbox.cardboard_box.notWhitelisted":  "This block is not allowed by the cardboard box whitelist"
 }
