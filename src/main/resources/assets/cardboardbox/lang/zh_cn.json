@@ -3,5 +3,6 @@
     "block.cardboardbox.cardboard_box.inventoryFull":  "你的背包好像满了",
     "block.cardboardbox.cardboard_box.banned.block":  "这个方块塞不下",
     "block.cardboardbox.cardboard_box.banned.tile":  "这个方块实体我好像搬不动",
-    "block.cardboardbox.cardboard_box.notWhitelisted":  "这个方块不在纸箱白名单里"
+    "block.cardboardbox.cardboard_box.notWhitelisted":  "这个方块不在纸箱白名单里",
+    "item.cardboardbox.cardboard_box":  "纸箱"
 }
