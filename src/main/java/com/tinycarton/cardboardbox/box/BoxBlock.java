@@ -47,12 +47,16 @@ public class BoxBlock extends BaseEntityBlock {
     /** ItemStack NBT：被装载方块实体的 NBT（方块没有方块实体时不写入） */
     public static final String BLOCK_ENTITY_DATA_TAG = "tileData";
 
-    public BoxBlock() {
-        super(BlockBehaviour.Properties.of()
-                .mapColor(MapColor.DIRT)
-                .strength(2f, 2f));
+    public BoxBlock(BlockBehaviour.Properties properties) {
+        super(properties);
         // 只有水平四向：默认朝北
         registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH));
+    }
+
+    public BoxBlock() {
+        this(BlockBehaviour.Properties.of()
+                .mapColor(MapColor.DIRT)
+                .strength(2f, 2f));
     }
 
     @Override
