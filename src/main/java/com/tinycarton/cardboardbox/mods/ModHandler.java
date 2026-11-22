@@ -91,7 +91,7 @@ public class ModHandler {
         WhitelistManager.init(FabricLoader.getInstance().getConfigDir());
 
         for (ResourceLocation id : BuiltInRegistries.BLOCK_ENTITY_TYPE.keySet()) {
-            BlockEntityType<?> type = BuiltInRegistries.BLOCK_ENTITY_TYPE.get(id);
+            BlockEntityType<?> type = BuiltInRegistries.BLOCK_ENTITY_TYPE.get(id).map(ref -> ref.value()).orElse(null);
             if (type == null) {
                 continue;
             }
