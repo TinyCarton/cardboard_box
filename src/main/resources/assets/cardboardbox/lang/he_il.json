@@ -3,5 +3,6 @@
     "block.cardboardbox.cardboard_box.inventoryFull":  "נראה שהתיק שלך מלא",
     "block.cardboardbox.cardboard_box.banned.block":  "אני לא חושב שאני יכול לשאת את הבלוק הזה",
     "block.cardboardbox.cardboard_box.banned.tile":  "אני לא חושב שאני יכול לשאת את הבלוק הזה עם התכולה שלו",
-    "block.cardboardbox.cardboard_box.notWhitelisted":  "This block is not allowed by the cardboard box whitelist"
+    "block.cardboardbox.cardboard_box.notWhitelisted":  "This block is not allowed by the cardboard box whitelist",
+    "item.cardboardbox.cardboard_box":  "ארגז קרטון"
 }

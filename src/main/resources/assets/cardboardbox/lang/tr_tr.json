@@ -3,5 +3,6 @@
     "block.cardboardbox.cardboard_box.inventoryFull":  "Envanterin dolu görünüyor",
     "block.cardboardbox.cardboard_box.banned.block":  "Sanırım bu bloğu taşıyamam",
     "block.cardboardbox.cardboard_box.banned.tile":  "Sanırım bu bloğu içeriğiyle birlikte taşıyamam",
-    "block.cardboardbox.cardboard_box.notWhitelisted":  "This block is not allowed by the cardboard box whitelist"
+    "block.cardboardbox.cardboard_box.notWhitelisted":  "This block is not allowed by the cardboard box whitelist",
+    "item.cardboardbox.cardboard_box":  "Karton Kutu"
 }
