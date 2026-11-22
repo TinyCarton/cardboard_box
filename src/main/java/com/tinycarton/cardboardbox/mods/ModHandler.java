@@ -9,7 +9,7 @@ import com.tinycarton.cardboardbox.handler.WhitelistManager;
 
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 
 /**
@@ -90,8 +90,8 @@ public class ModHandler {
         // 白名单文件：首次启动按「带方块实体的方块」自动生成
         WhitelistManager.init(FabricLoader.getInstance().getConfigDir());
 
-        for (ResourceLocation id : BuiltInRegistries.BLOCK_ENTITY_TYPE.keySet()) {
-            BlockEntityType<?> type = BuiltInRegistries.BLOCK_ENTITY_TYPE.get(id);
+        for (Identifier id : BuiltInRegistries.BLOCK_ENTITY_TYPE.keySet()) {
+            BlockEntityType<?> type = BuiltInRegistries.BLOCK_ENTITY_TYPE.get(id).map(ref -> ref.value()).orElse(null);
             if (type == null) {
                 continue;
             }

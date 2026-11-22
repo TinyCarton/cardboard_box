@@ -3,11 +3,12 @@ package com.tinycarton.cardboardbox.box;
 import com.tinycarton.cardboardbox.CardboardBox;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 /**
  * 纸箱方块实体：只存两样东西。
@@ -15,10 +16,10 @@ import net.minecraft.world.level.block.state.BlockState;
  *     <li>{@link #placementState}：被装走的方块状态（含朝向等属性）</li>
  *     <li>{@link #placementData}：被装走的方块实体 NBT</li>
  * </ul>
- * 存档键：{@code storedTile}（int，Block.getId）与 {@code tileData}（CompoundTag）。
+ * 存档键：{@code storedTile}（int，{@link Block#getId}）与 {@code tileData}（CompoundTag）。
  * <p>
- * 1.21.1 的方块实体读写统一走 {@code loadAdditional} / {@code saveAdditional}，
- * 额外带一个 {@link HolderLookup.Provider} 用于组件解析。
+ * 26.1.2 的方块实体读写走 {@link ValueInput} / {@link ValueOutput}，
+ * 不再直接操作 {@link CompoundTag}。
  */
 public class BoxBlockEntity extends BlockEntity {
     private BlockState placementState;
@@ -29,23 +30,19 @@ public class BoxBlockEntity extends BlockEntity {
     }
 
     @Override
-    protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag, registries);
-        if (tag.contains("storedTile")) {
-            setStateForPlacement(Block.stateById(tag.getInt("storedTile")));
-            if (tag.contains("tileData")) {
-                setDataForPlacement(tag.getCompound("tileData"));
-            }
-        }
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        input.getInt("storedTile").ifPresent(id -> setStateForPlacement(Block.stateById(id)));
+        input.read("tileData", CompoundTag.CODEC).ifPresent(this::setDataForPlacement);
     }
 
     @Override
-    protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag, registries);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
         if (getStateForPlacement() != null) {
-            tag.putInt("storedTile", Block.getId(placementState));
+            output.putInt("storedTile", Block.getId(placementState));
             if (getDataForPlacement() != null) {
-                tag.put("tileData", getDataForPlacement());
+                output.store("tileData", CompoundTag.CODEC, getDataForPlacement());
             }
         }
     }

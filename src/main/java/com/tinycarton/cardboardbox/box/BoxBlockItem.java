@@ -3,7 +3,7 @@ package com.tinycarton.cardboardbox.box;
 import static com.tinycarton.cardboardbox.box.BoxBlock.BLOCK_ENTITY_DATA_TAG;
 import static com.tinycarton.cardboardbox.box.BoxBlock.STORE_ITEM_TAG;
 
-import java.util.List;
+import java.util.function.Consumer;
 
 import com.tinycarton.cardboardbox.CardboardBox;
 import com.tinycarton.cardboardbox.handler.CanPickUpResult;
@@ -11,11 +11,12 @@ import com.tinycarton.cardboardbox.handler.Handler;
 import com.tinycarton.cardboardbox.handler.HandlerManager;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -24,6 +25,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.CustomData;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
@@ -32,6 +34,9 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.TagValueOutput;
+import net.minecraft.world.level.storage.ValueInput;
 
 /**
  * 纸箱物品（BlockItem），整个模组的核心交互。
@@ -42,13 +47,17 @@ import net.minecraft.world.level.block.state.BlockState;
 public class BoxBlockItem extends BlockItem {
 
     public BoxBlockItem(Block block) {
-        super(block, new Item.Properties());
+        this(block, new Item.Properties());
+    }
+
+    public BoxBlockItem(Block block, Item.Properties properties) {
+        super(block, properties);
     }
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
         Level level = context.getLevel();
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
         }
 
@@ -75,7 +84,12 @@ public class BoxBlockItem extends BlockItem {
         if (result == CanPickUpResult.CAN_PICK_UP) {
             final BlockState state = level.getBlockState(pos).getBlock().defaultBlockState();
             final BlockEntity blockEntity = level.getBlockEntity(pos);
-            final CompoundTag tag = blockEntity != null ? blockEntity.saveWithId(level.registryAccess()) : null;
+            CompoundTag tag = null;
+            if (blockEntity != null) {
+                TagValueOutput output = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, level.registryAccess());
+                blockEntity.saveWithId(output);
+                tag = output.buildResult();
+            }
 
             level.removeBlockEntity(pos);
             BlockState boxState = getBlock().defaultBlockState().setValue(BoxBlock.FACING, player.getDirection().getOpposite());
@@ -90,11 +104,11 @@ public class BoxBlockItem extends BlockItem {
         }
 
         if (result == CanPickUpResult.BANNED_BLOCK_ENTITY) {
-            player.displayClientMessage(Component.translatable(CardboardBox.BOX_BLOCK.getDescriptionId() + ".banned.tile"), true);
+            player.displayClientMessage(Component.translatable("block.cardboardbox.cardboard_box.banned.tile"), true);
         } else if (result == CanPickUpResult.BANNED_BLOCK) {
-            player.displayClientMessage(Component.translatable(CardboardBox.BOX_BLOCK.getDescriptionId() + ".banned.block"), true);
+            player.displayClientMessage(Component.translatable("block.cardboardbox.cardboard_box.banned.block"), true);
         } else if (result == CanPickUpResult.NOT_WHITELISTED) {
-            player.displayClientMessage(Component.translatable(CardboardBox.BOX_BLOCK.getDescriptionId() + ".notWhitelisted"), true);
+            player.displayClientMessage(Component.translatable("block.cardboardbox.cardboard_box.notWhitelisted"), true);
         }
         return InteractionResult.SUCCESS;
     }
@@ -140,10 +154,11 @@ public class BoxBlockItem extends BlockItem {
                 if (storedBlockEntityData != null) {
                     BlockEntity blockEntity = context.getLevel().getBlockEntity(pos);
                     if (blockEntity != null) {
+                        ValueInput input = TagValueInput.create(ProblemReporter.DISCARDING, context.getLevel().registryAccess(), storedBlockEntityData);
                         if (handler != null) {
-                            handler.loadData(blockEntity, storedBlockEntityData, context.getLevel().registryAccess());
+                            handler.loadData(blockEntity, input);
                         } else {
-                            blockEntity.loadWithComponents(storedBlockEntityData, context.getLevel().registryAccess());
+                            blockEntity.loadWithComponents(input);
                         }
                     }
                 }
@@ -156,7 +171,7 @@ public class BoxBlockItem extends BlockItem {
                 heldItemStack.shrink(1);
 
                 if (!context.getPlayer().isCreative() && !context.getPlayer().getInventory().add(new ItemStack(getBlock()))) {
-                    context.getPlayer().spawnAtLocation(new ItemStack(getBlock()), 0F);
+                    context.getPlayer().drop(new ItemStack(getBlock()), false);
                 }
             }
             return InteractionResult.SUCCESS;
@@ -165,10 +180,10 @@ public class BoxBlockItem extends BlockItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flagIn) {
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> tooltip, TooltipFlag flagIn) {
         BlockState state = getStoredBlock(stack);
         if (state.getBlock() != Blocks.AIR) {
-            tooltip.add(Component.translatable(state.getBlock().getDescriptionId()));
+            tooltip.accept(Component.translatable(state.getBlock().getDescriptionId()));
         }
     }
 
@@ -176,16 +191,14 @@ public class BoxBlockItem extends BlockItem {
     public BlockState getStoredBlock(ItemStack stack) {
         CompoundTag tag = getStoredTag(stack);
         return tag != null && tag.contains(STORE_ITEM_TAG)
-                ? Block.stateById(tag.getInt(STORE_ITEM_TAG))
+                ? Block.stateById(tag.getInt(STORE_ITEM_TAG).orElse(0))
                 : Blocks.AIR.defaultBlockState();
     }
 
     /** @return 物品里存的方块实体 NBT；没有内容返回 null */
     public CompoundTag getStoredBlockEntityData(ItemStack stack) {
         CompoundTag tag = getStoredTag(stack);
-        return tag != null && tag.contains(BLOCK_ENTITY_DATA_TAG)
-                ? tag.getCompound(BLOCK_ENTITY_DATA_TAG)
-                : null;
+        return tag != null ? tag.getCompound(BLOCK_ENTITY_DATA_TAG).orElse(null) : null;
     }
 
     private static CompoundTag getStoredTag(ItemStack stack) {

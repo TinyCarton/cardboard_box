@@ -16,7 +16,7 @@ import com.google.gson.JsonParser;
 import com.tinycarton.cardboardbox.CardboardBox;
 
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 
 /**
@@ -34,7 +34,7 @@ import net.minecraft.world.level.block.Block;
 public final class WhitelistManager {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final String FILE_NAME = "cardboardbox_whitelist.json";
-    private static final Set<ResourceLocation> ALLOWED = new LinkedHashSet<>();
+    private static final Set<Identifier> ALLOWED = new LinkedHashSet<>();
     private static Path file;
 
     private WhitelistManager() {
@@ -55,9 +55,9 @@ public final class WhitelistManager {
 
     /** 扫描注册表：只收录带方块实体的方块 */
     private static void generateDefaults() {
-        Set<ResourceLocation> defaults = new LinkedHashSet<>();
-        for (ResourceLocation id : BuiltInRegistries.BLOCK.keySet()) {
-            Block block = BuiltInRegistries.BLOCK.get(id);
+        Set<Identifier> defaults = new LinkedHashSet<>();
+        for (Identifier id : BuiltInRegistries.BLOCK.keySet()) {
+            Block block = BuiltInRegistries.BLOCK.get(id).map(ref -> ref.value()).orElse(null);
             if (block != null && block.defaultBlockState().hasBlockEntity()) {
                 defaults.add(id);
             }
@@ -66,7 +66,7 @@ public final class WhitelistManager {
         CardboardBox.LOGGER.info("Generated default whitelist with {} block entity blocks at {}", defaults.size(), file);
     }
 
-    private static void write(Set<ResourceLocation> ids) {
+    private static void write(Set<Identifier> ids) {
         JsonObject root = new JsonObject();
         JsonArray array = new JsonArray();
         ids.forEach(id -> array.add(id.toString()));
@@ -89,7 +89,7 @@ public final class WhitelistManager {
             JsonArray array = root.getAsJsonArray("blocks");
             if (array != null) {
                 for (JsonElement element : array) {
-                    ResourceLocation id = ResourceLocation.tryParse(element.getAsString());
+                    Identifier id = Identifier.tryParse(element.getAsString());
                     if (id != null) {
                         ALLOWED.add(id);
                     }
@@ -103,7 +103,7 @@ public final class WhitelistManager {
 
     /** 该方块是否在白名单内 */
     public static boolean isAllowed(Block block) {
-        ResourceLocation id = BuiltInRegistries.BLOCK.getKey(block);
+        Identifier id = BuiltInRegistries.BLOCK.getKey(block);
         return id != null && ALLOWED.contains(id);
     }
 
