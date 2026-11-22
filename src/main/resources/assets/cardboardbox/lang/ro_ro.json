@@ -1,7 +1,7 @@
 {
     "block.cardboardbox.cardboard_box":  "Cutie de carton",
     "block.cardboardbox.cardboard_box.inventoryFull":  "Se pare că inventarul tău este plin",
-    "block.cardboardbox.cardboard_box.banned.block":  "This block doesn\u0027t seem to fit",
+    "block.cardboardbox.cardboard_box.banned.block":  "This block doesn\u0027t fit",
     "block.cardboardbox.cardboard_box.banned.tile":  "Nu cred că pot căra acel bloc împreună cu conținutul",
     "block.cardboardbox.cardboard_box.notWhitelisted":  "This block is not allowed by the cardboard box whitelist"
 }
