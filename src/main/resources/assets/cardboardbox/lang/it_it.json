@@ -1,7 +1,7 @@
 {
     "block.cardboardbox.cardboard_box":  "Scatola di cartone",
     "block.cardboardbox.cardboard_box.inventoryFull":  "Il tuo inventario sembra pieno",
-    "block.cardboardbox.cardboard_box.banned.block":  "This block doesn\u0027t seem to fit",
+    "block.cardboardbox.cardboard_box.banned.block":  "This block doesn\u0027t fit",
     "block.cardboardbox.cardboard_box.banned.tile":  "Non credo di poter trasportare quel blocco con il suo contenuto",
     "block.cardboardbox.cardboard_box.notWhitelisted":  "This block is not allowed by the cardboard box whitelist"
 }
