@@ -82,7 +82,7 @@ public class BoxBlockItem extends BlockItem {
         CanPickUpResult result = HandlerManager.INSTANCE.canPickUp(level, pos);
 
         if (result == CanPickUpResult.CAN_PICK_UP) {
-            final BlockState state = level.getBlockState(pos);
+            final BlockState state = level.getBlockState(pos).getBlock().defaultBlockState();
             final BlockEntity blockEntity = level.getBlockEntity(pos);
             // 普通方块没有方块实体，此时只保存方块状态
             final CompoundTag tag = blockEntity != null ? blockEntity.saveWithId() : null;
@@ -146,7 +146,7 @@ public class BoxBlockItem extends BlockItem {
             Handler handler = HandlerManager.INSTANCE.getHandler(storedBlockState.getBlock());
 
             // 优先还原原状态，保证朝向、连接、含水等属性一致
-            BlockState stateToPlace = storedBlockState;
+            BlockState stateToPlace = storedBlockState.getBlock().defaultBlockState();
             if (!storedBlockState.canSurvive(context.getLevel(), pos)) {
                 // 原状态在当前位置无法存活（例如悬空的火把），按点击面重新计算
                 BlockState adjusted = storedBlockState.getBlock().getStateForPlacement(context);

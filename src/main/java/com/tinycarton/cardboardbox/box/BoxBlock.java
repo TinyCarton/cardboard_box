@@ -133,7 +133,7 @@ public class BoxBlock extends BaseEntityBlock {
             return false;
         }
         // 1) 把纸箱位置换回原来的方块（UPDATE_ALL：通知客户端并触发周围方块的邻居更新）
-        if (!level.setBlock(pos, boxBlockEntity.getStateForPlacement(), Block.UPDATE_ALL)) {
+        if (!level.setBlock(pos, boxBlockEntity.getStateForPlacement().getBlock().defaultBlockState(), Block.UPDATE_ALL)) {
             return false;
         }
         // 2) 写回方块实体数据（容器里的东西、机器设置等）
