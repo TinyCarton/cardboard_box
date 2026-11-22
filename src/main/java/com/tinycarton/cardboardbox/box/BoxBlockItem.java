@@ -104,11 +104,11 @@ public class BoxBlockItem extends BlockItem {
         }
 
         if (result == CanPickUpResult.BANNED_BLOCK_ENTITY) {
-            player.sendOverlayMessage(Component.translatable(CardboardBox.BOX_BLOCK.get().getDescriptionId() + ".banned.tile"));
+            player.sendOverlayMessage(Component.translatable(CardboardBox.BOX_BLOCK.get().getDescriptionId() + ".banned.block"));
         } else if (result == CanPickUpResult.BANNED_BLOCK) {
             player.sendOverlayMessage(Component.translatable(CardboardBox.BOX_BLOCK.get().getDescriptionId() + ".banned.block"));
         } else if (result == CanPickUpResult.NOT_WHITELISTED) {
-            player.sendOverlayMessage(Component.translatable(CardboardBox.BOX_BLOCK.get().getDescriptionId() + ".notWhitelisted"));
+            player.sendOverlayMessage(Component.translatable(CardboardBox.BOX_BLOCK.get().getDescriptionId() + ".banned.block"));
         }
         return InteractionResult.SUCCESS;
     }

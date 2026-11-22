@@ -1,8 +1,7 @@
 {
     "block.cardboardbox.cardboard_box":  "紙箱",
     "block.cardboardbox.cardboard_box.inventoryFull":  "你的背包好像滿了",
-    "block.cardboardbox.cardboard_box.banned.block":  "這個方塊我好像搬不動",
+    "block.cardboardbox.cardboard_box.banned.block":  "這個方塊我好像塞不下",
     "block.cardboardbox.cardboard_box.banned.tile":  "這個方塊實體我好像搬不動",
-    "block.cardboardbox.cardboard_box.notWhitelisted":  "這個方塊不在紙箱白名單裡",
-    "item.cardboardbox.cardboard_box":  "紙箱"
+    "block.cardboardbox.cardboard_box.notWhitelisted":  "這個方塊不在紙箱白名單裡"
 }
