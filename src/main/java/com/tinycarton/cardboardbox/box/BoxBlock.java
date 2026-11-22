@@ -190,10 +190,11 @@ public class BoxBlock extends BaseEntityBlock {
     /**
      * 创造模式中键取方块 / 结构方块保存时使用，保证复制出来的物品也带内容。
      */
-    @Override
     public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
         return toItemStack(level, pos);
-    }    @Override
+    }
+
+    @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new BoxBlockEntity(pos, state);
     }
