@@ -93,6 +93,11 @@ public class HandlerManager {
         if (block instanceof com.tinycarton.cardboardbox.box.BoxBlock) {
             return CanPickUpResult.BANNED_BLOCK;
         }
+        // Hard-coded: door blocks (#minecraft:doors) cannot be stored.
+        // The other half of a double block cannot move with the box, leaving a broken door.
+        if (world.getBlockState(pos).is(net.minecraft.tags.BlockTags.DOORS)) {
+            return CanPickUpResult.BANNED_BLOCK;
+        }
 
         // 黑名单优先级高于白名单
         if (blacklistEnabled) {
