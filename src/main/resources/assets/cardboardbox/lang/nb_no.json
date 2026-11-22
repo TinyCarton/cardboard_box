@@ -3,5 +3,6 @@
     "block.cardboardbox.cardboard_box.inventoryFull":  "Det ser ut som at inventaret ditt er fullt",
     "block.cardboardbox.cardboard_box.banned.block":  "This block doesn\u0027t fit",
     "block.cardboardbox.cardboard_box.banned.tile":  "Jeg tror ikke jeg kan bære den blokken med innholdet",
-    "block.cardboardbox.cardboard_box.notWhitelisted":  "This block is not allowed by the cardboard box whitelist"
+    "block.cardboardbox.cardboard_box.notWhitelisted":  "This block is not allowed by the cardboard box whitelist",
+    "item.cardboardbox.cardboard_box":  "Pappeske"
 }
