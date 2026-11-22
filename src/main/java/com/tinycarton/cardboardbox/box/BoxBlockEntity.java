@@ -7,42 +7,42 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 /**
  * 纸箱方块实体：只存两样东西。
  * <ul>
- *     <li>{@link #placementState}：被装走的方块状态（含朝向、朝向属性等）</li>
- *     <li>{@link #placementData}：被装走的方块实体 NBT（箱子里的物品、机器设置等）</li>
+ *     <li>{@link #placementState}：被装走的方块状态（含朝向等属性）</li>
+ *     <li>{@link #placementData}：被装走的方块实体 NBT</li>
  * </ul>
- * 存档里的 NBT 键与反编译结果完全一致：{@code storedTile}（int，Block.getId）与 {@code tileData}（CompoundTag）。
+ * 存档键：{@code storedTile}（int，{@link Block#getId}）与 {@code tileData}（CompoundTag）。
  * <p>
- * 这个 BE 没有任何 ticking 逻辑，也从不做网络同步：数据只在服务端进出纸箱时使用。
+ * 26.1.2 的方块实体读写走 {@link ValueInput} / {@link ValueOutput}，
+ * 不再直接操作 {@link CompoundTag}。
  */
 public class BoxBlockEntity extends BlockEntity {
     private BlockState placementState;
     private CompoundTag placementData;
 
     public BoxBlockEntity(BlockPos pos, BlockState state) {
-        super(CardboardBox.BOX_BLOCK_ENTITY_TYPE.get(), pos, state);
+        super(CardboardBox.BOX_BLOCK_ENTITY.get(), pos, state);
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
-        if (tag.contains("storedTile")) {
-            setStateForPlacement(Block.stateById(tag.getInt("storedTile")));
-            if (tag.contains("tileData")) {
-                setDataForPlacement(tag.getCompound("tileData"));
-            }
-        }
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        input.getInt("storedTile").ifPresent(id -> setStateForPlacement(Block.stateById(id)));
+        input.read("tileData", CompoundTag.CODEC).ifPresent(this::setDataForPlacement);
     }
 
     @Override
-    public void saveAdditional(CompoundTag tag) {
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
         if (getStateForPlacement() != null) {
-            tag.putInt("storedTile", Block.getId(placementState));
+            output.putInt("storedTile", Block.getId(placementState));
             if (getDataForPlacement() != null) {
-                tag.put("tileData", getDataForPlacement());
+                output.store("tileData", CompoundTag.CODEC, getDataForPlacement());
             }
         }
     }
@@ -57,7 +57,7 @@ public class BoxBlockEntity extends BlockEntity {
         setChanged();
     }
 
-    /** @return 被装走的方块实体 NBT；可能为 null（方块没有 BE 或没数据） */
+    /** @return 被装走的方块实体 NBT；可能为 null */
     public CompoundTag getDataForPlacement() {
         return placementData;
     }

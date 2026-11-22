@@ -3,5 +3,6 @@
     "block.cardboardbox.cardboard_box.inventoryFull":  "It seems your inventory is full",
     "block.cardboardbox.cardboard_box.banned.block":  "I don\u0027t think I can carry that block",
     "block.cardboardbox.cardboard_box.banned.tile":  "I don\u0027t think I can carry that block with its contents",
-    "block.cardboardbox.cardboard_box.notWhitelisted":  "This block is not allowed by the cardboard box whitelist"
+    "block.cardboardbox.cardboard_box.notWhitelisted":  "This block is not allowed by the cardboard box whitelist",
+    "item.cardboardbox.cardboard_box":  "Cardboard Box"
 }

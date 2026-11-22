@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "P": "minecraft:paper",
+    "S": "minecraft:slime_ball",
+    "L": "#cardboardbox:stripped_logs"
+  },
+  "pattern": [
+    "PSP",
+    "PLP",
+    "PPP"
+  ],
+  "result": {
+    "count": 1,
+    "id": "cardboardbox:cardboard_box"
+  }
+}

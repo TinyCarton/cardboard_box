@@ -3,5 +3,6 @@
     "block.cardboardbox.cardboard_box.inventoryFull":  "Sepertinya tas kamu penuh",
     "block.cardboardbox.cardboard_box.banned.block":  "Sepertinya aku tidak bisa membawa blok itu",
     "block.cardboardbox.cardboard_box.banned.tile":  "Sepertinya aku tidak bisa membawa blok itu beserta isinya",
-    "block.cardboardbox.cardboard_box.notWhitelisted":  "This block is not allowed by the cardboard box whitelist"
+    "block.cardboardbox.cardboard_box.notWhitelisted":  "This block is not allowed by the cardboard box whitelist",
+    "item.cardboardbox.cardboard_box":  "Kotak kardus"
 }
