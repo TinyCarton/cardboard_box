@@ -18,11 +18,11 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     // 1.21.9 起 fabric-api 聚合包的 javadoc 会让 Loom 1.11 报中间映射断言失败，
     // 改为显式依赖所需模块（同一份 API，只是不再拉 javadoc）
-    modImplementation "net.fabricmc.fabric-api:fabric-api-base:1.0.0+14b92d897d"
-    modImplementation "net.fabricmc.fabric-api:fabric-item-api-v1:11.5.8+9bce411b7d"
-    modImplementation "net.fabricmc.fabric-api:fabric-item-group-api-v1:4.2.24+86b3ae577d"
-    modImplementation "net.fabricmc.fabric-api:fabric-object-builder-api-v1:21.1.24+9bce411b7d"
-    modImplementation "net.fabricmc.fabric-api:fabric-registry-sync-v0:6.1.41+679c8c5c7d"
+    modImplementation "net.fabricmc.fabric-api:fabric-api-base:1.0.0+14b92d896f"
+    modImplementation "net.fabricmc.fabric-api:fabric-item-api-v1:11.5.11+9bce411b6f"
+    modImplementation "net.fabricmc.fabric-api:fabric-item-group-api-v1:4.2.27+86b3ae576f"
+    modImplementation "net.fabricmc.fabric-api:fabric-object-builder-api-v1:21.1.28+9bce411b6f"
+    modImplementation "net.fabricmc.fabric-api:fabric-registry-sync-v0:6.1.42+679c8c5c6f"
 }
 
 def resourceProperties = [
