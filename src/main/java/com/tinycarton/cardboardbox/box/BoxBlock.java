@@ -8,7 +8,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -23,7 +23,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.BlockHitResult;
 
@@ -42,7 +42,7 @@ import net.minecraft.world.phys.BlockHitResult;
  */
 public class BoxBlock extends BaseEntityBlock {
     /** 水平朝向（仅平面四向） */
-    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
     /** 物品数据键：被装载方块的 BlockState.getId()（int） */
     public static final String STORE_ITEM_TAG = "storedItem";
     /** 物品数据键：被装载方块实体的 NBT（方块没有方块实体时不写入） */
@@ -97,9 +97,9 @@ public class BoxBlock extends BaseEntityBlock {
      * 右键纸箱：普通右键只取箱、潜行右键连方块一起取走。
      */
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if (level.isClientSide) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return InteractionResult.PASS;
         }
 
         boolean hasContent = level.getBlockEntity(pos) instanceof BoxBlockEntity boxBlockEntity
@@ -110,20 +110,20 @@ public class BoxBlock extends BaseEntityBlock {
             ItemStack box = toItemStack(level, pos);
             if (box == null || box.isEmpty()) {
                 player.displayClientMessage(Component.translatable(CardboardBox.BOX_BLOCK.getDescriptionId() + ".error.stack.null"), true);
-                return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+                return InteractionResult.PASS;
             }
             if (!player.getInventory().add(box)) {
                 player.displayClientMessage(Component.translatable(CardboardBox.BOX_BLOCK.getDescriptionId() + ".inventoryFull"), true);
-                return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+                return InteractionResult.PASS;
             }
             player.getInventory().setChanged();
             level.removeBlock(pos, false);
-            return ItemInteractionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
 
         return restoreStoredBlock(level, pos, player)
-                ? ItemInteractionResult.SUCCESS
-                : ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+                ? InteractionResult.SUCCESS
+                : InteractionResult.PASS;
     }
 
     /**
@@ -150,7 +150,7 @@ public class BoxBlock extends BaseEntityBlock {
         if (!player.isCreative()) {
             ItemStack box = new ItemStack(this);
             if (player.getInventory().add(box)) {
-                player.spawnAtLocation(box, 0F);
+                player.drop(box, false);
             }
         }
         return true;
@@ -183,7 +183,6 @@ public class BoxBlock extends BaseEntityBlock {
     /**
      * 创造模式中键取方块 / 结构方块保存时使用，保证复制出来的物品也带内容。
      */
-    @Override
     public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
         return toItemStack(level, pos);
     }

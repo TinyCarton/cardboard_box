@@ -156,7 +156,7 @@ public class BoxBlockItem extends BlockItem {
                 heldItemStack.shrink(1);
 
                 if (!context.getPlayer().isCreative() && !context.getPlayer().getInventory().add(new ItemStack(getBlock()))) {
-                    context.getPlayer().spawnAtLocation(new ItemStack(getBlock()), 0F);
+                    context.getPlayer().drop(new ItemStack(getBlock()), false);
                 }
             }
             return InteractionResult.SUCCESS;
