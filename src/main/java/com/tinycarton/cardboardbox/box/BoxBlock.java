@@ -47,12 +47,21 @@ public class BoxBlock extends BaseEntityBlock {
     /** ItemStack NBT：被装载方块实体的 NBT（方块没有方块实体时不写入） */
     public static final String BLOCK_ENTITY_DATA_TAG = "tileData";
 
-    public BoxBlock() {
-        super(BlockBehaviour.Properties.of()
-                .mapColor(MapColor.DIRT)
-                .strength(2f, 2f));
+    public BoxBlock(BlockBehaviour.Properties properties) {
+        super(properties);
         // 只有水平四向：默认朝北
         registerDefaultState(defaultBlockState().setValue(FACING, Direction.NORTH));
+    }
+
+    public BoxBlock() {
+        this(BlockBehaviour.Properties.of()
+                .mapColor(MapColor.DIRT)
+                .strength(2f, 2f));
+    }
+
+    /** 1.20.3+ 的 BaseEntityBlock 抽象方法 */
+    protected com.mojang.serialization.MapCodec<? extends BaseEntityBlock> codec() {
+        return com.mojang.serialization.MapCodec.unit(this);
     }
 
     @Override
@@ -187,7 +196,6 @@ public class BoxBlock extends BaseEntityBlock {
     /**
      * 创造模式中键取方块 / 结构方块保存时使用，保证复制出来的物品也带内容。
      */
-    @Override
     public ItemStack getCloneItemStack(BlockGetter level, BlockPos pos, BlockState state) {
         return toItemStack(level, pos);
     }
