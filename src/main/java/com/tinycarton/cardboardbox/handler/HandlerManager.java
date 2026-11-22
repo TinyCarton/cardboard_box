@@ -94,6 +94,12 @@ public class HandlerManager {
             return CanPickUpResult.BANNED_BLOCK;
         }
 
+        // 硬编码：门类方块（#minecraft:doors）不允许装。
+        // 双格方块的另一半无法随箱子移动，装走会留下残缺的门。
+        if (world.getBlockState(pos).is(net.minecraft.tags.BlockTags.DOORS)) {
+            return CanPickUpResult.BANNED_BLOCK;
+        }
+
         // 黑名单优先级高于白名单
         if (blacklistEnabled) {
             if (blockBanList.contains(block)) {
